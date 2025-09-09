@@ -90,7 +90,6 @@ const navigation: NavigationItem[] = [
     ],
   },
   { name: "Reports", href: "/reports", icon: BarChart3 },
- 
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -128,12 +127,12 @@ const Sidebar: React.FC = () => {
 
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col bg-white dark:bg-gray-800 transition-all duration-300 md:translate-x-0 overflow-y-auto shadow-sm border-r border-gray-200 dark:border-gray-700"
+          "fixed inset-y-0 left-0 z-50 flex flex-col bg-gray-800 dark:bg-gray-700 transition-all duration-300 md:translate-x-0 overflow-y-auto shadow-sm border-r border-gray-300 dark:border-gray-600"
         )}
         style={{ width: `${sidebarWidth}px` }}
         aria-label="Sidebar navigation"
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-300 dark:border-gray-600">
           <div 
             className="flex items-center gap-3 min-w-0 cursor-pointer"
             onClick={toggleSidebarCollapse}
@@ -147,8 +146,8 @@ const Sidebar: React.FC = () => {
             </div>
             {!sidebarCollapsed && (
               <div className="min-w-0 flex flex-col">
-                <h3 className="text-xl font-bold text-gray-800 dark:text-white">NEWLINE</h3>
-                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Transport Company</h4>
+                <h3 className="text-xl font-bold text-white dark:text-white">NEWLINE</h3>
+                <h4 className="text-sm font-medium text-gray-100 dark:text-gray-200">Transport Company</h4>
               </div>
             )}
           </div>
@@ -158,11 +157,11 @@ const Sidebar: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={toggleSidebarCollapse}
-                className="hidden md:flex h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="hidden md:flex h-8 w-8 p-0 hover:bg-gray-300 dark:hover:bg-gray-600"
                 title="Collapse sidebar"
                 aria-label="Collapse sidebar"
               >
-                <Menu className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                <Menu className="h-6 w-6 text-white dark:text-gray-200" />
               </Button>
             )}
           </div>
@@ -189,23 +188,23 @@ const Sidebar: React.FC = () => {
                       sidebarCollapsed
                         ? "px-2 py-2.5 justify-center"
                         : "px-3 py-2.5",
-                      "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      "text-white hover:bg-yellow-100 dark:hover:bg-yellow-900/20 hover:text-gray-900 dark:hover:text-yellow-400"
                     )}
                     aria-expanded={isOpen}
                     aria-controls={`dropdown-${item.name}`}
                     title={sidebarCollapsed ? item.name : undefined}
                   >
                     {Icon && (
-                      <Icon className="h-5 w-5 flex-shrink-0 text-gray-600 dark:text-gray-400" aria-hidden="true" />
+                      <Icon className="h-5 w-5 flex-shrink-0 text-white dark:text-gray-200" aria-hidden="true" />
                     )}
                     {!sidebarCollapsed && (
                       <span className="flex-1 text-left">{item.name}</span>
                     )}
                     {!sidebarCollapsed &&
                       (isOpen ? (
-                        <ChevronUp className="h-4 w-4 ml-auto text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                        <ChevronUp className="h-4 w-4 ml-auto text-gray-100 dark:text-gray-200" aria-hidden="true" />
                       ) : (
-                        <ChevronDown className="h-4 w-4 ml-auto text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                        <ChevronDown className="h-4 w-4 ml-auto text-gray-100 dark:text-gray-200" aria-hidden="true" />
                       ))}
                   </button>
 
@@ -220,7 +219,7 @@ const Sidebar: React.FC = () => {
                               "block text-sm rounded-md px-3 py-2 transition-all",
                               isActive
                                 ? "bg-yellow-100 dark:bg-yellow-900/20 text-gray-900 dark:text-yellow-400 font-medium"
-                                : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-300"
+                                : "text-white hover:bg-yellow-100 dark:hover:bg-yellow-900/20 hover:text-gray-900 dark:hover:text-yellow-400"
                             )
                           }
                         >
@@ -245,7 +244,7 @@ const Sidebar: React.FC = () => {
                       : "px-3 py-2.5",
                     isActive
                       ? "bg-yellow-100 dark:bg-yellow-900/20 text-gray-900 dark:text-yellow-400 shadow-sm border-r-2 border-yellow-500 dark:border-yellow-400"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      : "text-white hover:bg-yellow-100 dark:hover:bg-yellow-900/20 hover:text-gray-900 dark:hover:text-yellow-400"
                   )
                 }
                 title={sidebarCollapsed ? item.name : undefined}
@@ -256,7 +255,7 @@ const Sidebar: React.FC = () => {
                       <Icon
                         className={cn(
                           "h-5 w-5 flex-shrink-0",
-                          isActive ? "text-yellow-600 dark:text-yellow-400" : "text-gray-600 dark:text-gray-400"
+                          isActive ? "text-yellow-600 dark:text-yellow-400" : "text-white dark:text-gray-200"
                         )}
                         aria-hidden="true"
                       />
@@ -265,7 +264,7 @@ const Sidebar: React.FC = () => {
                       <span className="flex-1">{item.name}</span>
                     )}
                     {sidebarCollapsed && (
-                      <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-200 text-xs rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                      <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 dark:bg-gray-600 text-white dark:text-gray-200 text-xs rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
                         {item.name}
                       </div>
                     )}
