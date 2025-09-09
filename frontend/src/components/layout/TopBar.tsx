@@ -173,15 +173,15 @@ const TopBar = () => {
                 <h3 className="font-medium text-gray-900 dark:text-white">{t.notifications}</h3>
               </div>
               <div className="space-y-2 p-2 max-h-60 overflow-y-auto">
-                <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{t.notification1.title}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{t.notification1.description}</p>
                 </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{t.notification2.title}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{t.notification2.description}</p>
                 </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{t.notification3.title}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{t.notification3.description}</p>
                 </div>
