@@ -1,0 +1,264 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Logistifie Admin Dashboard Design System */
+
+@layer base {
+  :root {
+    /* Base colors */
+    --background: 248 10% 97%;
+    --foreground: 215 25% 27%;
+
+    /* Card system */
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 27%;
+
+    /* Interactive elements */
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 27%;
+
+    /* Brand colors - Professional logistics theme */
+    --primary: 210 85% 48%;
+    --primary-light: 210 85% 65%;
+    --primary-dark: 210 85% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 20% 93%;
+    --secondary-foreground: 215 25% 27%;
+
+    --muted: 215 20% 96%;
+    --muted-foreground: 215 15% 55%;
+
+    --accent: 168 76% 42%;
+    --accent-light: 168 76% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Status colors */
+    --success: 142 71% 45%;
+    --success-light: 142 71% 65%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 25 95% 53%;
+    --warning-light: 25 95% 65%;
+    --warning-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-light: 0 72% 65%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* UI elements */
+    --border: 215 20% 88%;
+    --input: 215 20% 93%;
+    --ring: 210 85% 48%;
+
+    /* Layout */
+    --radius: 0.75rem;
+    --sidebar-width: 280px;
+    --topbar-height: 70px;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(210 85% 48%) 0%, hsl(210 85% 35%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(168 76% 42%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(215 20% 98%) 100%);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(215 25% 27% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(215 25% 27% / 0.1), 0 2px 4px -1px hsl(215 25% 27% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(215 25% 27% / 0.1), 0 4px 6px -2px hsl(215 25% 27% / 0.05);
+    --shadow-xl: 0 20px 25px -5px hsl(215 25% 27% / 0.1), 0 10px 10px -5px hsl(215 25% 27% / 0.04);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Base colors */
+    --background: 215 30% 7%;
+    --foreground: 215 15% 92%;
+
+    /* Cards */
+    --card: 215 25% 10%;
+    --card-foreground: 215 15% 92%;
+
+    /* Interactive */
+    --popover: 215 25% 10%;
+    --popover-foreground: 215 15% 92%;
+
+    /* Brand colors adjusted for dark */
+    --primary: 210 85% 60%;
+    --primary-light: 210 85% 75%;
+    --primary-dark: 210 85% 45%;
+    --primary-foreground: 215 30% 7%;
+
+    --secondary: 215 25% 15%;
+    --secondary-foreground: 215 15% 92%;
+
+    --muted: 215 25% 12%;
+    --muted-foreground: 215 15% 65%;
+
+    --accent: 168 76% 55%;
+    --accent-light: 168 76% 70%;
+    --accent-foreground: 215 30% 7%;
+
+    /* Status colors for dark */
+    --success: 142 71% 55%;
+    --success-light: 142 71% 70%;
+    --success-foreground: 215 30% 7%;
+
+    --warning: 25 95% 53%;
+    --warning-light: 25 95% 65%;
+    --warning-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 60%;
+    --destructive-light: 0 72% 75%;
+    --destructive-foreground: 215 30% 7%;
+
+    /* UI elements */
+    --border: 215 25% 18%;
+    --input: 215 25% 15%;
+    --ring: 210 85% 60%;
+
+    /* Dark mode gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(210 85% 60%) 0%, hsl(210 85% 45%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 71% 55%) 0%, hsl(168 76% 55%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(215 25% 10%) 0%, hsl(215 25% 12%) 100%);
+    
+    /* Dark shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -1px hsl(0 0% 0% / 0.2);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.3), 0 4px 6px -2px hsl(0 0% 0% / 0.2);
+    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.4), 0 10px 10px -5px hsl(0 0% 0% / 0.3);
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-foreground;
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-success {
+    background: var(--gradient-success);
+  }
+  
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  .shadow-elegant {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .sidebar-width {
+    width: var(--sidebar-width);
+  }
+  
+  .topbar-height {
+    height: var(--topbar-height);
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.3s ease-out;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+};
+
+
+/* Hide scrollbar by default */
+.hover-scrollbar {
+  scrollbar-width: none; /* Firefox: hide scrollbar */
+}
+
+.hover-scrollbar::-webkit-scrollbar {
+  width: 0; /* Chrome, Safari, Edge: hide scrollbar */
+}
+
+/* Show small scrollbar on hover */
+.hover-scrollbar:hover {
+  scrollbar-width: thin; /* Firefox: small scrollbar */
+  scrollbar-color: #888 transparent; /* Firefox: thumb color, transparent track */
+}
+
+.hover-scrollbar:hover::-webkit-scrollbar {
+  width: 4px; 
+  height: 3px; /* Chrome, Safari, Edge: very small scrollbar */
+}
+
+.hover-scrollbar:hover::-webkit-scrollbar-track {
+  background: transparent; /* Transparent track */
+}
+
+.hover-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #888; /* Scrollbar thumb color */
+  border-radius: 2px; /* Rounded edges for thumb */
+}
+
+.hover-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Darker thumb on hover */
+}
+
+/* Explicitly hide scrollbar buttons (arrows) for WebKit browsers */
+.hover-scrollbar::-webkit-scrollbar-button {
+  display: none; /* Hide arrows */
+}
+
