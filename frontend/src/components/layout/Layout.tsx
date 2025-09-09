@@ -28,7 +28,7 @@ const Layout = ({ children }: LayoutProps) => {
 
         {/* Page content */}
         <main className="flex-1 overflow-auto">
-          <div className="px-4 py-6 md:px-6 md:py-8">
+          <div className="px-4 py-6 md:px-2 md:py-8">
             {children}
           </div>
         </main>

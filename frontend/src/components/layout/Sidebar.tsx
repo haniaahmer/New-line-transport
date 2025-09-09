@@ -90,7 +90,7 @@ const navigation: NavigationItem[] = [
     ],
   },
   { name: "Reports", href: "/reports", icon: BarChart3 },
-  { name: "Communications", href: "/communications", icon: MessageSquare },
+ 
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 

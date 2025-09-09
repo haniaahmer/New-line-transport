@@ -1,12 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Search, Download, Plus, Edit, Trash2, Users, Target, Phone, Mail, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 
 const SalesmanSummary = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [performanceFilter, setPerformanceFilter] = useState('All');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [sorting, setSorting] = useState([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 5,
+  });
 
   const salesmen = [
     { 
@@ -148,31 +160,17 @@ const SalesmanSummary = () => {
     { title: 'Total Sales', value: `$${salesmen.reduce((sum, s) => sum + s.totalSales, 0).toLocaleString()}`, icon: Users, color: 'orange' }
   ];
 
-  const filteredSalesmen = salesmen.filter(salesman => {
-    const matchesSearch = salesman.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         salesman.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         salesman.phone.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'All' || salesman.status === statusFilter;
-    const matchesPerformance = performanceFilter === 'All' || salesman.performance === performanceFilter;
-    return matchesSearch && matchesStatus && matchesPerformance;
-  });
-
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredSalesmen.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentSalesmen = filteredSalesmen.slice(startIndex, startIndex + itemsPerPage);
-
-  const getStatusBadge = (status) => {
-    return (
-      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-        status === 'Active' 
-          ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
-          : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
-      }`}>
-        {status}
-      </span>
-    );
-  };
+  const getStatusBadge = (status) => (
+    <span
+      className={`px-3 py-1 rounded-full text-sm font-medium ${
+        status === 'Active'
+          ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+          : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+      }`}
+    >
+      {status}
+    </span>
+  );
 
   const getPerformanceBadge = (performance) => {
     const performanceColors = {
@@ -181,7 +179,6 @@ const SalesmanSummary = () => {
       'Average': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
       'Poor': 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
     };
-    
     return (
       <span className={`px-3 py-1 rounded-full text-sm font-medium ${performanceColors[performance]}`}>
         {performance}
@@ -198,41 +195,170 @@ const SalesmanSummary = () => {
     }).format(amount);
   };
 
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+  const columnHelper = createColumnHelper();
+
+  const columns = [
+    columnHelper.accessor('id', {
+      header: 'ID',
+      cell: (info) => <span className="text-gray-900 dark:text-white">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('name', {
+      header: 'Salesman Name',
+      cell: (info) => (
+        <span className="text-blue-600 dark:text-blue-400 font-medium hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer">
+          {info.getValue()}
+        </span>
+      ),
+    }),
+    columnHelper.accessor('phone', {
+      header: 'Phone Number',
+      cell: (info) => (
+        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+          <Phone size={16} className="text-gray-500 dark:text-gray-400" />
+          {info.getValue()}
+        </div>
+      ),
+    }),
+    columnHelper.accessor('email', {
+      header: 'Email Address',
+      cell: (info) => (
+        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+          <Mail size={16} className="text-gray-500 dark:text-gray-400" />
+          {info.getValue()}
+        </div>
+      ),
+    }),
+    columnHelper.accessor('status', {
+      header: 'Status',
+      cell: (info) => getStatusBadge(info.getValue()),
+    }),
+    columnHelper.accessor('performance', {
+      header: 'Performance',
+      cell: (info) => getPerformanceBadge(info.getValue()),
+    }),
+    columnHelper.accessor('totalSales', {
+      header: 'Total Sales',
+      cell: (info) => <span className="text-gray-900 dark:text-white font-medium">{formatCurrency(info.getValue())}</span>,
+    }),
+    columnHelper.accessor('totalLeads', {
+      header: 'Total Leads',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('conversionRate', {
+      header: 'Conversion Rate',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300 font-medium">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('joinDate', {
+      header: 'Join Date',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('lastActivity', {
+      header: 'Last Activity',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
+    }),
+    columnHelper.display({
+      id: 'actions',
+      header: 'Action',
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleEdit(row.original.id)}
+            className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-150"
+          >
+            <Edit size={16} />
+          </button>
+          <button
+            onClick={() => handleDelete(row.original.id)}
+            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-150"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
+    }),
+  ];
+
+  const filteredSalesmen = useMemo(
+    () =>
+      salesmen.filter((salesman) => {
+        const matchesSearch = salesman.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             salesman.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             salesman.phone.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'All' || salesman.status === statusFilter;
+        const matchesPerformance = performanceFilter === 'All' || salesman.performance === performanceFilter;
+        return matchesSearch && matchesStatus && matchesPerformance;
+      }),
+    [searchTerm, statusFilter, performanceFilter]
+  );
+
+  const table = useReactTable({
+    data: filteredSalesmen,
+    columns,
+    onSortingChange: setSorting,
+    onPaginationChange: setPagination,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+      pagination,
+    },
+  });
+
+  const resetFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('All');
+    setPerformanceFilter('All');
+    table.setPageIndex(0);
+  };
+
+  const handleEdit = (salesmanId) => {
+    console.log('Edit salesman:', salesmanId);
+  };
+
+  const handleDelete = (salesmanId) => {
+    console.log('Delete salesman:', salesmanId);
+  };
+
+  const handleAddSalesman = () => {
+    console.log('Add new salesman');
+  };
+
+  const handleExportCSV = () => {
+    console.log('Export CSV');
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">AMS / SALESMAN SUMMARY</h1>
-            <p className="text-gray-600 dark:text-gray-300">Manage all sales personnel and their performance metrics</p>
-          </div>
-          <div className="flex gap-4">
-            <button className="bg-blue-500 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-200 hover:bg-destructive/90 hover:scale-105
-              dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-white">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        {/* Header Container */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">AMS / Salesman Summary</h1>
+              <p className="text-gray-600 dark:text-gray-400">Manage all sales personnel and their performance metrics</p>
+            </div>
+            <button
+              onClick={handleAddSalesman}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-200 hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
+            >
               <Plus size={20} />
-              ADD NEW
+              Add Salesman
             </button>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Stats Container */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             const colorClasses = {
               blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
               green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
               purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
-              orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400'
+              orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
             };
-            
             return (
               <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
                 <div className="flex items-center justify-between">
@@ -249,12 +375,15 @@ const SalesmanSummary = () => {
           })}
         </div>
 
-        {/* Filters and Search */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-6">
+        {/* Filters Container */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
           <div className="flex flex-wrap gap-4 items-center justify-between">
-            <div className="flex gap-4 items-center flex-1">
+            <div className="flex gap-4 items-center flex-1 min-w-0">
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
+                  size={20}
+                />
                 <input
                   type="text"
                   placeholder="Search salesmen..."
@@ -262,30 +391,28 @@ const SalesmanSummary = () => {
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
-                    setCurrentPage(1);
+                    table.setPageIndex(0);
                   }}
                 />
               </div>
-              
               <select
                 className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 value={statusFilter}
                 onChange={(e) => {
                   setStatusFilter(e.target.value);
-                  setCurrentPage(1);
+                  table.setPageIndex(0);
                 }}
               >
                 <option value="All">All Status</option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
-
               <select
                 className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 value={performanceFilter}
                 onChange={(e) => {
                   setPerformanceFilter(e.target.value);
-                  setCurrentPage(1);
+                  table.setPageIndex(0);
                 }}
               >
                 <option value="All">All Performance</option>
@@ -294,113 +421,139 @@ const SalesmanSummary = () => {
                 <option value="Average">Average</option>
                 <option value="Poor">Poor</option>
               </select>
-
-              <button 
+              <button
                 className="px-4 py-3 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-200"
-                onClick={() => {
-                  setSearchTerm('');
-                  setStatusFilter('All');
-                  setPerformanceFilter('All');
-                  setCurrentPage(1);
-                }}
+                onClick={resetFilters}
               >
                 Reset
               </button>
-              <button className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-200">
-                <Download size={18} />
-                Export CSV
-              </button>
+            </div>
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-200"
+            >
+              <Download size={18} />
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        {/* Table Container */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Salesman List</h2>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-
+                  {Math.min(
+                    (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                    filteredSalesmen.length
+                  )} of {filteredSalesmen.length} salesmen
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Show:</span>
+                <select
+                  className="px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  value={table.getState().pagination.pageSize}
+                  onChange={(e) => table.setPageSize(Number(e.target.value))}
+                >
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select>
+                <span className="text-sm text-gray-600 dark:text-gray-400">per page</span>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Salesmen Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden mb-6">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
-                <tr>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">ID</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Salesman Name</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Phone Number</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Email Address</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Status</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Performance</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Total Sales</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Total Leads</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Conversion Rate</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Join Date</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Last Activity</th>
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentSalesmen.map((salesman, index) => (
-                  <tr key={salesman.id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                    <td className="py-4 px-6 text-gray-900 dark:text-white">{salesman.id}</td>
-                    <td className="py-4 px-6">
-                      <span className="text-blue-600 dark:text-blue-400 font-medium hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer">
-                        {salesman.name}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <Phone size={16} className="text-gray-500 dark:text-gray-400" />
-                        {salesman.phone}
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                        <Mail size={16} className="text-gray-500 dark:text-gray-400" />
-                        {salesman.email}
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">{getStatusBadge(salesman.status)}</td>
-                    <td className="py-4 px-6">{getPerformanceBadge(salesman.performance)}</td>
-                    <td className="py-4 px-6 text-gray-900 dark:text-white font-medium">{formatCurrency(salesman.totalSales)}</td>
-                    <td className="py-4 px-6 text-gray-700 dark:text-gray-300">{salesman.totalLeads}</td>
-                    <td className="py-4 px-6 text-gray-700 dark:text-gray-300 font-medium">{salesman.conversionRate}</td>
-                    <td className="py-4 px-6 text-gray-700 dark:text-gray-300">{salesman.joinDate}</td>
-                    <td className="py-4 px-6 text-gray-700 dark:text-gray-300">{salesman.lastActivity}</td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-2">
-                        <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-150">
-                          <Edit size={16} />
-                        </button>
-                        <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="max-h-96 overflow-y-auto hover:overflow-y-auto transition-all duration-300">
+              <table className="w-full">
+                <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <th
+                          key={header.id}
+                          className={`text-left py-4 px-6 font-semibold text-gray-900 dark:text-white cursor-pointer select-none ${
+                            header.id === 'id' ? 'min-w-[80px]' :
+                            header.id === 'name' ? 'min-w-[150px]' :
+                            header.id === 'phone' ? 'min-w-[150px]' :
+                            header.id === 'email' ? 'min-w-[150px]' :
+                            header.id === 'status' ? 'min-w-[120px]' :
+                            header.id === 'performance' ? 'min-w-[120px]' :
+                            header.id === 'totalSales' ? 'min-w-[120px]' :
+                            header.id === 'totalLeads' ? 'min-w-[120px]' :
+                            header.id === 'conversionRate' ? 'min-w-[120px]' :
+                            header.id === 'joinDate' ? 'min-w-[120px]' :
+                            header.id === 'lastActivity' ? 'min-w-[120px]' :
+                            header.id === 'actions' ? 'min-w-[100px]' : ''
+                          }`}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          <div className="flex items-center">
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(header.column.columnDef.header, header.getContext())}
+                            {{
+                              asc: ' ↑',
+                              desc: ' ↓',
+                            }[header.column.getIsSorted()] ?? null}
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody>
+                  {table.getRowModel().rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id} className="py-4 px-6">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex justify-between items-center">
-          <div className="text-gray-600">
-            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredSalesmen.length)} of {filteredSalesmen.length} entries
-          </div>
-          <div className="flex gap-2">
-            <button 
-              className="flex items-center gap-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft size={16} />
-              Previous
-            </button>
-            <button 
-              className="flex items-center gap-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              Next
-              <ChevronRight size={16} />
-            </button>
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div className="text-sm text-gray-700 dark:text-gray-300">
+              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                className={`flex items-center gap-1 px-4 py-2 rounded-lg ${
+                  !table.getCanPreviousPage()
+                    ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <ChevronLeft size={18} />
+                Previous
+              </button>
+              <button
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                className={`flex items-center gap-1 px-4 py-2 rounded-lg ${
+                  !table.getCanNextPage()
+                    ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                Next
+                <ChevronRight size={18} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
