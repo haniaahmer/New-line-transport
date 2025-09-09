@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Download, Plus, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Download, Plus, Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import {
   createColumnHelper,
   flexRender,
@@ -69,7 +69,7 @@ const FinanceReport = () => {
     for (let i = -30; i <= 30; i++) {
       const date = new Date();
       date.setDate(today.getDate() + i);
-      dates.push(date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }));
+      dates.push(date.toISOString().split('T')[0]);
     }
     return dates;
   };
@@ -96,6 +96,16 @@ const FinanceReport = () => {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
+  };
+
+  const formatDateForDisplay = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: '2-digit', 
+      year: 'numeric' 
+    });
   };
 
   const handleFilterChange = (key, value) => {
@@ -230,148 +240,153 @@ const FinanceReport = () => {
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header Container */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Finance Report</h1>
               <p className="text-gray-600 dark:text-gray-400">Manage and track financial metrics and job activities</p>
             </div>
-            <button
-              onClick={handleAddJob}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-200 hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
-            >
-              <Plus size={20} />
-              Add Job
-            </button>
-          </div>
-        </div>
-
-        {/* Filters Container */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-          <div className="flex flex-wrap gap-4 items-center justify-between">
-            <div className="flex gap-4 items-center flex-1 min-w-0">
-              <div className="relative flex-1 max-w-md">
-                <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
-                  size={20}
-                />
-                <input
-                  type="text"
-                  placeholder="Search jobs..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                />
-              </div>
-              <div className="relative">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="From Date"
-                    value={filters.from}
-                    onChange={(e) => handleFilterChange('from', e.target.value)}
-                    className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white pr-10"
-                    onFocus={() => setShowFromCalendar(true)}
-                  />
-                  <Calendar
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 cursor-pointer"
-                    size={20}
-                    onClick={() => setShowFromCalendar(!showFromCalendar)}
-                  />
-                </div>
-                {showFromCalendar && (
-                  <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto">
-                    {dates.map((date, index) => (
-                      <div
-                        key={index}
-                        className="px-4 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer text-gray-900 dark:text-white"
-                        onClick={() => handleDateSelect(date, 'from')}
-                      >
-                        {date}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div className="relative">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="To Date"
-                    value={filters.to}
-                    onChange={(e) => handleFilterChange('to', e.target.value)}
-                    className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white pr-10"
-                    onFocus={() => setShowToCalendar(true)}
-                  />
-                  <Calendar
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 cursor-pointer"
-                    size={20}
-                    onClick={() => setShowToCalendar(!showToCalendar)}
-                  />
-                </div>
-                {showToCalendar && (
-                  <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto">
-                    {dates.map((date, index) => (
-                      <div
-                        key={index}
-                        className="px-4 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer text-gray-900 dark:text-white"
-                        onClick={() => handleDateSelect(date, 'to')}
-                      >
-                        {date}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <select
-                value={filters.month}
-                onChange={(e) => handleFilterChange('month', e.target.value)}
-                className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                {months.map((month) => (
-                  <option key={month} value={month}>{month}</option>
-                ))}
-              </select>
-              <select
-                value={filters.client}
-                onChange={(e) => handleFilterChange('client', e.target.value)}
-                className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                {filterOptions.clients.map((client) => (
-                  <option key={client} value={client}>{client}</option>
-                ))}
-              </select>
-              <select
-                value={filters.driver}
-                onChange={(e) => handleFilterChange('driver', e.target.value)}
-                className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                {filterOptions.drivers.map((driver) => (
-                  <option key={driver} value={driver}>{driver}</option>
-                ))}
-              </select>
-              <select
-                value={filters.vehicle}
-                onChange={(e) => handleFilterChange('vehicle', e.target.value)}
-                className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                {filterOptions.vehicles.map((vehicle) => (
-                  <option key={vehicle} value={vehicle}>{vehicle}</option>
-                ))}
-              </select>
+            <div className="flex items-center gap-3">
               <button
-                className="px-4 py-3 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-200"
-                onClick={clearFilters}
+                onClick={handleExportCSV}
+                className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-full font-medium flex items-center gap-2 transition-all duration-200"
               >
-                Clear Filters
+                <Download size={20} />
+                Export CSV
+              </button>
+              <button
+                onClick={handleAddJob}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-200 hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
+              >
+                <Plus size={20} />
+                Add Job
               </button>
             </div>
-            <button
-              onClick={handleExportCSV}
-              className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-200"
-            >
-              <Download size={18} />
-              Export CSV
-            </button>
+          </div>
+
+          {/* Filters Section */}
+          <div className="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-6 space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Filters</h3>
+              <button
+                onClick={clearFilters}
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 flex items-center gap-1 transition-colors duration-200"
+              >
+                <X size={16} />
+                Clear All
+              </button>
+            </div>
+            
+            {/* Search Bar */}
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Search by Job ID, Booker, or Passenger..."
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+              />
+            </div>
+
+            {/* Date Range Widget */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Date Range</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">From Date</label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={filters.from}
+                      onChange={(e) => handleFilterChange('from', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                    {filters.from && (
+                      <button
+                        onClick={() => handleFilterChange('from', '')}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="relative">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">To Date</label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={filters.to}
+                      onChange={(e) => handleFilterChange('to', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                    {filters.to && (
+                      <button
+                        onClick={() => handleFilterChange('to', '')}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Filter Dropdowns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Month</label>
+                <select
+                  value={filters.month}
+                  onChange={(e) => handleFilterChange('month', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  {months.map((month) => (
+                    <option key={month} value={month}>{month}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Client</label>
+                <select
+                  value={filters.client}
+                  onChange={(e) => handleFilterChange('client', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  {filterOptions.clients.map((client) => (
+                    <option key={client} value={client}>{client}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Driver</label>
+                <select
+                  value={filters.driver}
+                  onChange={(e) => handleFilterChange('driver', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  {filterOptions.drivers.map((driver) => (
+                    <option key={driver} value={driver}>{driver}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle</label>
+                <select
+                  value={filters.vehicle}
+                  onChange={(e) => handleFilterChange('vehicle', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  {filterOptions.vehicles.map((vehicle) => (
+                    <option key={vehicle} value={vehicle}>{vehicle}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
