@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Download, Plus, Edit, Trash2, Users, CreditCard, Calendar, Building, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Download, Plus, Edit, Trash2, CheckCircle, Calendar, Truck, DollarSign, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   createColumnHelper,
   flexRender,
@@ -10,9 +10,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-const CorporateAccountSummary = () => {
+const ClearedBooking = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [accountTypeFilter, setAccountTypeFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = useState({
@@ -20,56 +19,77 @@ const CorporateAccountSummary = () => {
     pageSize: 5,
   });
 
-  const accounts = [
+  const bookings = [
     { 
-      id: 2246, 
-      name: 'Ilhea', 
-      officeAddress: '', 
-      email: 'ABDULLAH.H@TTHRACAR.COM.SA', 
-      accountType: 'Credit Account', 
-      cnpjNumber: '0.3a', 
-      creditLimit: '', 
-      salesPlan: '', 
-      lastJobDate: '21/07/2025', 
-      status: 'Active' 
+      id: 1, 
+      accountName: 'Company A', 
+      jobNo: '001', 
+      jobRef: 'REF001', 
+      jobDate: '2025-09-09', 
+      time: '14:30', 
+      passenger: 'John Doe', 
+      jobType: 'Standard', 
+      reqVeh: 'Van', 
+      pickUpAddress: '123 London St, London', 
+      dropOffAddress: '456 Birmingham Rd, Birmingham', 
+      distanceDriven: '150 km', 
+      driver: 'Mike S', 
+      total: '$120', 
+      paymentType: 'Credit Card', 
+      priceReview: 'Approved', 
+      status: 'Cleared' 
     },
     { 
-      id: 2185, 
-      name: 'KIMPTON', 
-      officeAddress: 'KAFD, 1st (الرئيس السريع)', 
-      email: 'info@kimpton.sa', 
-      accountType: 'Credit Account', 
-      cnpjNumber: '0.3a', 
-      creditLimit: '', 
-      salesPlan: '', 
-      lastJobDate: '02/09/2025', 
-      status: 'Active' 
+      id: 2, 
+      accountName: 'Company B', 
+      jobNo: '002', 
+      jobRef: 'REF002', 
+      jobDate: '2025-09-08', 
+      time: '09:15', 
+      passenger: 'Jane Smith', 
+      jobType: 'Express', 
+      reqVeh: 'Truck', 
+      pickUpAddress: '789 Manchester Ave, Manchester', 
+      dropOffAddress: '101 Liverpool Ln, Liverpool', 
+      distanceDriven: '200 km', 
+      driver: 'Sarah L', 
+      total: '$200', 
+      paymentType: 'Cash', 
+      priceReview: 'Pending', 
+      status: 'Cleared' 
     },
     { 
-      id: 2158, 
-      name: 'Intercontinental(tah)', 
-      officeAddress: 'Riyadh', 
-      email: 'inter@inter.com', 
-      accountType: 'Credit Account', 
-      cnpjNumber: '0.3a', 
-      creditLimit: '', 
-      salesPlan: '', 
-      lastJobDate: '15/08/2025', 
-      status: 'Active' 
+      id: 3, 
+      accountName: 'Company C', 
+      jobNo: '003', 
+      jobRef: 'REF003', 
+      jobDate: '2025-09-07', 
+      time: '16:45', 
+      passenger: 'Alex P', 
+      jobType: 'Priority', 
+      reqVeh: 'Van', 
+      pickUpAddress: '321 Edinburgh Rd, Edinburgh', 
+      dropOffAddress: '654 Glasgow St, Glasgow', 
+      distanceDriven: '180 km', 
+      driver: 'Tom R', 
+      total: '$150', 
+      paymentType: 'Bank Transfer', 
+      priceReview: 'Approved', 
+      status: 'Cleared' 
     },
   ];
 
   const stats = [
-    { title: 'Total Accounts', value: accounts.length, icon: Users, color: 'blue' },
-    { title: 'Active Accounts', value: accounts.filter(a => a.status === 'Active').length, icon: CreditCard, color: 'green' },
-    { title: 'Credit Accounts', value: accounts.filter(a => a.accountType === 'Credit Account').length, icon: Building, color: 'purple' },
-    { title: 'Recent Jobs', value: accounts.filter(a => a.lastJobDate).length, icon: Calendar, color: 'orange' }
+    { title: 'Total Cleared Bookings', value: bookings.length, icon: CheckCircle, color: 'green' },
+    { title: 'Recent Clearances', value: bookings.filter(b => new Date(b.jobDate) >= new Date('2025-09-01')).length, icon: Calendar, color: 'orange' },
+    { title: 'Total Revenue', value: '$470', icon: DollarSign, color: 'blue' },
+    { title: 'Drivers Involved', value: new Set(bookings.map(b => b.driver)).size, icon: Truck, color: 'purple' }
   ];
 
   const getStatusBadge = (status) => (
     <span
       className={`px-3 py-1 rounded-full text-sm font-medium ${
-        status === 'Active'
+        status === 'Cleared'
           ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
           : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
       }`}
@@ -78,74 +98,72 @@ const CorporateAccountSummary = () => {
     </span>
   );
 
-  const getAccountTypeBadge = (type) => (
-    <span
-      className={`px-3 py-1 rounded-full text-sm font-medium ${
-        type === 'Credit Account'
-          ? 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300'
-          : 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-      }`}
-    >
-      {type}
-    </span>
-  );
-
   const columnHelper = createColumnHelper();
 
   const columns = [
-    columnHelper.accessor('id', {
-      header: 'S.No#',
+    columnHelper.accessor('accountName', {
+      header: 'Account Name',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('jobNo', {
+      header: 'Job No.#',
       cell: (info) => <span className="text-gray-900 dark:text-white">{info.getValue()}</span>,
     }),
-    columnHelper.accessor('name', {
-      header: 'Name',
+    columnHelper.accessor('jobRef', {
+      header: 'Job Ref',
       cell: (info) => (
         <span className="text-blue-600 dark:text-blue-400 font-medium hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer">
           {info.getValue()}
         </span>
       ),
     }),
-    columnHelper.accessor('officeAddress', {
-      header: 'Office Address',
-      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue() || '-'}</span>,
-    }),
-    columnHelper.accessor('email', {
-      header: 'Email Address',
+    columnHelper.accessor('jobDate', {
+      header: 'Job Date',
       cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
     }),
-    columnHelper.accessor('accountType', {
-      header: 'Account Type',
-      cell: (info) => getAccountTypeBadge(info.getValue()),
-    }),
-    columnHelper.accessor('cnpjNumber', {
-      header: 'CNPJ Number',
+    columnHelper.accessor('time', {
+      header: 'Time',
       cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
     }),
-    columnHelper.accessor('creditLimit', {
-      header: 'Credit Limit',
-      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue() || '-'}</span>,
+    columnHelper.accessor('passenger', {
+      header: 'Passenger',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
     }),
-    columnHelper.accessor('salesPlan', {
-      header: 'Sales Plan',
-      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue() || '-'}</span>,
+    columnHelper.accessor('jobType', {
+      header: 'Job Type',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
     }),
-    columnHelper.accessor('lastJobDate', {
-      header: 'Last Job Date',
-      cell: (info) => (
-        <span
-          className={`text-sm ${
-            info.getValue() === 'No Jobs'
-              ? 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded-full'
-              : 'text-gray-700 dark:text-gray-300'
-          }`}
-        >
-          {info.getValue()}
-        </span>
-      ),
+    columnHelper.accessor('reqVeh', {
+      header: 'Req. Veh.',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
     }),
-    columnHelper.accessor('status', {
-      header: 'Status',
-      cell: (info) => getStatusBadge(info.getValue()),
+    columnHelper.accessor('pickUpAddress', {
+      header: 'Pick Up Address',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('dropOffAddress', {
+      header: 'Drop Off Address',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('distanceDriven', {
+      header: 'Distance Driven',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('driver', {
+      header: 'Driver',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('total', {
+      header: 'Total',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('paymentType', {
+      header: 'Payment Type',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('priceReview', {
+      header: 'Price Review',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue()}</span>,
     }),
     columnHelper.display({
       id: 'actions',
@@ -169,20 +187,21 @@ const CorporateAccountSummary = () => {
     }),
   ];
 
-  const filteredAccounts = useMemo(
+  const filteredBookings = useMemo(
     () =>
-      accounts.filter((account) => {
-        const matchesSearch = account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             account.email.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesAccountType = accountTypeFilter === 'All' || account.accountType === accountTypeFilter;
-        const matchesStatus = statusFilter === 'All' || account.status === statusFilter;
-        return matchesSearch && matchesAccountType && matchesStatus;
+      bookings.filter((booking) => {
+        const matchesSearch = booking.jobRef.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             booking.pickUpAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             booking.dropOffAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             booking.driver.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'All' || booking.status === statusFilter;
+        return matchesSearch && matchesStatus;
       }),
-    [searchTerm, accountTypeFilter, statusFilter]
+    [searchTerm, statusFilter]
   );
 
   const table = useReactTable({
-    data: filteredAccounts,
+    data: filteredBookings,
     columns,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
@@ -198,21 +217,20 @@ const CorporateAccountSummary = () => {
 
   const resetFilters = () => {
     setSearchTerm('');
-    setAccountTypeFilter('All');
     setStatusFilter('All');
     table.setPageIndex(0);
   };
 
-  const handleEdit = (accountId) => {
-    console.log('Edit account:', accountId);
+  const handleEdit = (bookingId) => {
+    console.log('Edit booking:', bookingId);
   };
 
-  const handleDelete = (accountId) => {
-    console.log('Delete account:', accountId);
+  const handleDelete = (bookingId) => {
+    console.log('Delete booking:', bookingId);
   };
 
-  const handleAddAccount = () => {
-    console.log('Add new account');
+  const handleAddBooking = () => {
+    console.log('Add new booking');
   };
 
   const handleExportCSV = () => {
@@ -226,15 +244,15 @@ const CorporateAccountSummary = () => {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">AMS / Corporate Account Summary</h1>
-              <p className="text-gray-600 dark:text-gray-400">Manage all corporate accounts and their details</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Cleared Booking</h1>
+              <p className="text-gray-600 dark:text-gray-400">Manage all cleared booking details</p>
             </div>
             <button
-              onClick={handleAddAccount}
+              onClick={handleAddBooking}
               className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-200 hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
             >
               <Plus size={20} />
-              Add Account
+              Add Booking
             </button>
           </div>
         </div>
@@ -244,10 +262,10 @@ const CorporateAccountSummary = () => {
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             const colorClasses = {
-              blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
               green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
-              purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
               orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
+              blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+              purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
             };
             return (
               <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
@@ -276,7 +294,7 @@ const CorporateAccountSummary = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Search accounts..."
+                  placeholder="Search bookings..."
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   value={searchTerm}
                   onChange={(e) => {
@@ -287,18 +305,6 @@ const CorporateAccountSummary = () => {
               </div>
               <select
                 className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                value={accountTypeFilter}
-                onChange={(e) => {
-                  setAccountTypeFilter(e.target.value);
-                  table.setPageIndex(0);
-                }}
-              >
-                <option value="All">All Account Types</option>
-                <option value="Credit Account">Credit Account</option>
-                <option value="Other">Other</option>
-              </select>
-              <select
-                className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 value={statusFilter}
                 onChange={(e) => {
                   setStatusFilter(e.target.value);
@@ -306,8 +312,7 @@ const CorporateAccountSummary = () => {
                 }}
               >
                 <option value="All">All Status</option>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value="Cleared">Cleared</option>
               </select>
               <button
                 className="px-4 py-3 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-200"
@@ -331,13 +336,13 @@ const CorporateAccountSummary = () => {
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Account List</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Booking List</h2>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">
                   Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-
                   {Math.min(
                     (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-                    filteredAccounts.length
-                  )} of {filteredAccounts.length} accounts
+                    filteredBookings.length
+                  )} of {filteredBookings.length} bookings
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -366,16 +371,21 @@ const CorporateAccountSummary = () => {
                         <th
                           key={header.id}
                           className={`text-left py-4 px-6 font-semibold text-gray-900 dark:text-white cursor-pointer select-none ${
-                            header.id === 'id' ? 'min-w-[80px]' :
-                            header.id === 'name' ? 'min-w-[150px]' :
-                            header.id === 'officeAddress' ? 'min-w-[150px]' :
-                            header.id === 'email' ? 'min-w-[150px]' :
-                            header.id === 'accountType' ? 'min-w-[120px]' :
-                            header.id === 'cnpjNumber' ? 'min-w-[120px]' :
-                            header.id === 'creditLimit' ? 'min-w-[120px]' :
-                            header.id === 'salesPlan' ? 'min-w-[120px]' :
-                            header.id === 'lastJobDate' ? 'min-w-[120px]' :
-                            header.id === 'status' ? 'min-w-[120px]' :
+                            header.id === 'accountName' ? 'min-w-[150px]' :
+                            header.id === 'jobNo' ? 'min-w-[100px]' :
+                            header.id === 'jobRef' ? 'min-w-[120px]' :
+                            header.id === 'jobDate' ? 'min-w-[120px]' :
+                            header.id === 'time' ? 'min-w-[100px]' :
+                            header.id === 'passenger' ? 'min-w-[150px]' :
+                            header.id === 'jobType' ? 'min-w-[120px]' :
+                            header.id === 'reqVeh' ? 'min-w-[100px]' :
+                            header.id === 'pickUpAddress' ? 'min-w-[200px]' :
+                            header.id === 'dropOffAddress' ? 'min-w-[200px]' :
+                            header.id === 'distanceDriven' ? 'min-w-[120px]' :
+                            header.id === 'driver' ? 'min-w-[120px]' :
+                            header.id === 'total' ? 'min-w-[100px]' :
+                            header.id === 'paymentType' ? 'min-w-[120px]' :
+                            header.id === 'priceReview' ? 'min-w-[120px]' :
                             header.id === 'actions' ? 'min-w-[100px]' : ''
                           }`}
                           onClick={header.column.getToggleSortingHandler()}
@@ -448,4 +458,4 @@ const CorporateAccountSummary = () => {
   );
 };
 
-export default CorporateAccountSummary;
+export default ClearedBooking;

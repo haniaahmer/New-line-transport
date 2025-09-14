@@ -16,6 +16,7 @@ import {
   Target,
   Handshake,
   Shield,
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboardStore } from "@/stores/dashboardStore";
@@ -33,6 +34,8 @@ const navigation: NavigationItem[] = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Bookings", href: "/bookings", icon: Calendar },
   { name: "Dispatch", href: "/dispatch", icon: Truck },
+  { name: "Shared Platform", href: "/shared-platform", icon: Users },
+  { name: "Cleared Bookings", href: "/cleared-bookings", icon: CheckCircle },
   {
     name: "Clients",
     icon: Users,

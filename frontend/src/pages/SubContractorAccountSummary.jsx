@@ -21,20 +21,20 @@ const SubContractorAccountSummary = () => {
   });
 
   const accounts = [
-    { id: 1, name: 'DENO PARTNER', accountPayable: '£1,250.00', pjNumber: 'PJ-2024-001', paymentType: 'Credit', jobDate: '06/05/2024', status: 'Active' },
-    { id: 2, name: 'ABC CONTRACTORS', accountPayable: '£2,500.00', pjNumber: 'PJ-2024-002', paymentType: 'Cash', jobDate: '12/05/2024', status: 'Active' },
-    { id: 3, name: 'XYZ SERVICES', accountPayable: '£0.00', pjNumber: 'PJ-2024-003', paymentType: 'Credit', jobDate: '18/05/2024', status: 'Active' },
-    { id: 4, name: 'GLOBAL BUILDERS', accountPayable: '£3,750.00', pjNumber: 'PJ-2024-004', paymentType: 'Credit', jobDate: '24/05/2024', status: 'Inactive' },
-    { id: 5, name: 'QUALITY CONSTRUCTION', accountPayable: '£1,800.00', pjNumber: 'PJ-2024-005', paymentType: 'Cash', jobDate: '30/05/2024', status: 'Active' },
-    { id: 6, name: 'ELITE DEVELOPERS', accountPayable: '£0.00', pjNumber: 'PJ-2024-006', paymentType: 'Credit', jobDate: '05/06/2024', status: 'Active' },
-    { id: 7, name: 'PRIME CONTRACTORS', accountPayable: '£4,200.00', pjNumber: 'PJ-2024-007', paymentType: 'Cash', jobDate: '11/06/2024', status: 'Inactive' },
+    { id: 1, account: 'DENO PARTNER', officeAddress: '123 London St, London', accountPayableContact: 'Jane Doe', emailAddress: 'jane@denopartner.com', cnpjNumber: 'PJ-2024-001', salesman: 'Mike S', paymentType: 'Credit', lastJobDate: '2025-09-05', status: 'Active' },
+    { id: 2, account: 'ABC CONTRACTORS', officeAddress: '456 Manchester Rd, Manchester', accountPayableContact: 'John Smith', emailAddress: 'john@abccontractors.com', cnpjNumber: 'PJ-2024-002', salesman: 'Sarah L', paymentType: 'Cash', lastJobDate: '2025-09-04', status: 'Active' },
+    { id: 3, account: 'XYZ SERVICES', officeAddress: '789 Birmingham Ave, Birmingham', accountPayableContact: 'Alice Brown', emailAddress: 'alice@xyzservices.com', cnpjNumber: 'PJ-2024-003', salesman: 'Tom R', paymentType: 'Credit', lastJobDate: '2025-09-03', status: 'Inactive' },
+    { id: 4, account: 'GLOBAL BUILDERS', officeAddress: '101 Edinburgh St, Edinburgh', accountPayableContact: 'Bob Johnson', emailAddress: 'bob@globalbuilders.com', cnpjNumber: 'PJ-2024-004', salesman: 'Emma W', paymentType: 'Credit', lastJobDate: '2025-09-02', status: 'Active' },
+    { id: 5, account: 'QUALITY CONSTRUCTION', officeAddress: '202 Glasgow Ln, Glasgow', accountPayableContact: 'Carol White', emailAddress: 'carol@qualityconstruction.com', cnpjNumber: 'PJ-2024-005', salesman: 'James K', paymentType: 'Cash', lastJobDate: '2025-09-01', status: 'Active' },
+    { id: 6, account: 'ELITE DEVELOPERS', officeAddress: '303 Liverpool Rd, Liverpool', accountPayableContact: 'David Lee', emailAddress: 'david@elitedevelopers.com', cnpjNumber: 'PJ-2024-006', salesman: 'Lisa P', paymentType: 'Credit', lastJobDate: '2025-08-31', status: 'Active' },
+    { id: 7, account: 'PRIME CONTRACTORS', officeAddress: '404 Cardiff St, Cardiff', accountPayableContact: 'Emma Taylor', emailAddress: 'emma@primecontractors.com', cnpjNumber: 'PJ-2024-007', salesman: 'Mark T', paymentType: 'Cash', lastJobDate: '2025-08-30', status: 'Inactive' },
   ];
 
   const stats = [
     { title: 'Total Sub-Contractors', value: accounts.length, icon: Users, color: 'blue' },
     { title: 'Active Sub-Contractors', value: accounts.filter(a => a.status === 'Active').length, icon: CreditCard, color: 'green' },
-    { title: 'Accounts Payable', value: accounts.filter(a => parseFloat(a.accountPayable.replace(/[^0-9.-]+/g, "")) > 0).length, icon: Building, color: 'purple' },
-    { title: 'Recent Jobs', value: accounts.filter(a => a.jobDate).length, icon: Calendar, color: 'orange' },
+    { title: 'Accounts with Contacts', value: accounts.filter(a => a.accountPayableContact).length, icon: Building, color: 'purple' },
+    { title: 'Recent Jobs', value: accounts.filter(a => new Date(a.lastJobDate) >= new Date('2025-09-01')).length, icon: Calendar, color: 'orange' },
   ];
 
   const getStatusBadge = (status) => (
@@ -64,28 +64,44 @@ const SubContractorAccountSummary = () => {
   const columnHelper = createColumnHelper();
 
   const columns = [
-    columnHelper.accessor('name', {
-      header: 'Name',
+    columnHelper.accessor('id', {
+      header: 'S.NO#',
+      cell: (info) => <span className="text-gray-900 dark:text-white">{info.getValue()}</span>,
+    }),
+    columnHelper.accessor('account', {
+      header: 'Account',
       cell: (info) => (
         <span className="text-blue-600 dark:text-blue-400 font-medium hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer">
           {info.getValue()}
         </span>
       ),
     }),
-    columnHelper.accessor('accountPayable', {
-      header: 'Account Payable',
+    columnHelper.accessor('officeAddress', {
+      header: 'Office Address',
       cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue() || '-'}</span>,
     }),
-    columnHelper.accessor('pjNumber', {
-      header: 'PJ Number',
+    columnHelper.accessor('accountPayableContact', {
+      header: 'Account Payable Contact',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue() || '-'}</span>,
+    }),
+    columnHelper.accessor('emailAddress', {
+      header: 'Email Address',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue() || '-'}</span>,
+    }),
+    columnHelper.accessor('cnpjNumber', {
+      header: 'CNPJ Number',
+      cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue() || '-'}</span>,
+    }),
+    columnHelper.accessor('salesman', {
+      header: 'Salesman',
       cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue() || '-'}</span>,
     }),
     columnHelper.accessor('paymentType', {
       header: 'Payment Type',
       cell: (info) => getPaymentTypeBadge(info.getValue()),
     }),
-    columnHelper.accessor('jobDate', {
-      header: 'Job Date',
+    columnHelper.accessor('lastJobDate', {
+      header: 'Last Job Date',
       cell: (info) => <span className="text-gray-700 dark:text-gray-300">{info.getValue() || '-'}</span>,
     }),
     columnHelper.accessor('status', {
@@ -117,7 +133,11 @@ const SubContractorAccountSummary = () => {
   const filteredAccounts = useMemo(
     () =>
       accounts.filter((account) => {
-        const matchesSearch = account.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch = account.account.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             account.officeAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             account.accountPayableContact.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             account.emailAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             account.salesman.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesPaymentType = paymentTypeFilter === 'All' || account.paymentType === paymentTypeFilter;
         const matchesStatus = statusFilter === 'All' || account.status === statusFilter;
         return matchesSearch && matchesPaymentType && matchesStatus;
@@ -316,11 +336,15 @@ const SubContractorAccountSummary = () => {
                         <th
                           key={header.id}
                           className={`text-left py-4 px-6 font-semibold text-gray-900 dark:text-white cursor-pointer select-none ${
-                            header.id === 'name' ? 'min-w-[150px]' :
-                            header.id === 'accountPayable' ? 'min-w-[120px]' :
-                            header.id === 'pjNumber' ? 'min-w-[120px]' :
+                            header.id === 'id' ? 'min-w-[80px]' :
+                            header.id === 'account' ? 'min-w-[150px]' :
+                            header.id === 'officeAddress' ? 'min-w-[200px]' :
+                            header.id === 'accountPayableContact' ? 'min-w-[150px]' :
+                            header.id === 'emailAddress' ? 'min-w-[180px]' :
+                            header.id === 'cnpjNumber' ? 'min-w-[120px]' :
+                            header.id === 'salesman' ? 'min-w-[120px]' :
                             header.id === 'paymentType' ? 'min-w-[120px]' :
-                            header.id === 'jobDate' ? 'min-w-[120px]' :
+                            header.id === 'lastJobDate' ? 'min-w-[120px]' :
                             header.id === 'status' ? 'min-w-[120px]' :
                             header.id === 'actions' ? 'min-w-[100px]' : ''
                           }`}

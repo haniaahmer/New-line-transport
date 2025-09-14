@@ -23,6 +23,8 @@ import PersonalAccountSummary from "./pages/PersonalAccountSummary";
 import SubContractorAccountSummary from "./pages/SubContractorAccountSummary";
 import SalesmanSummary from "./pages/SalesmanSummary";
 import FinanceReport from "./pages/FinanceReport";
+import SharedPlatform from "./pages/SharedPlatform";
+import ClearedBooking from "./pages/ClearedBooking";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -35,6 +37,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/bookings" element={<Bookings />} />
+            <Route path="/cleared-bookings" element={<ClearedBooking />} />
+
             <Route path="/drivers" element={<Drivers />} />
             <Route path="/drivers/fleet" element={<FleetDriver />} />
             <Route path="/drivers/fleet-vehicle" element={<FleetVehicle />} />
@@ -45,6 +49,7 @@ const App = () => (
             <Route path="/clients/subcontractor" element={<SubContractorAccountSummary />} />
             <Route path="/crm/salesman-summary" element={<SalesmanSummary />} />
             <Route path="/dispatch" element={<Dispatch />} />
+            <Route path="/shared-platform" element={<SharedPlatform />} />
             <Route path="/vehicles" element={<Vehicles />} />
             <Route path="/customers" element={<Customers />} />
             <Route path="/finance/report" element={<FinanceReport />} />

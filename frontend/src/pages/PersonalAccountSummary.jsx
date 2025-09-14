@@ -165,7 +165,7 @@ const PersonalAccountSummary = () => {
 
   const columns = [
     columnHelper.accessor('id', {
-      header: 'Sl.No.',
+      header: 'S.No#',
       cell: (info) => <span className="text-gray-900 dark:text-white">{info.getValue()}</span>,
     }),
     columnHelper.accessor('name', {
