@@ -111,7 +111,7 @@ const columnHelper = createColumnHelper();
 
 const columns = [
   columnHelper.accessor('id', {
-    header: 'Sl.No.',
+    header: 'Sr.No.',
     cell: (info) => <span className="text-gray-900 dark:text-white">{info.getValue()}</span>,
   }),
   columnHelper.accessor('name', {
