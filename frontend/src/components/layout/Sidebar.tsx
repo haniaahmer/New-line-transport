@@ -109,13 +109,38 @@ const Sidebar: React.FC = () => {
 
   const toggleDropdown = useCallback((name: string) => {
     setOpenDropdowns((prev) =>
-      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+      prev.includes(name) ? prev.filter((n) => n !== name) : [name] // Only one dropdown open at a time when collapsed
     );
   }, []);
+
+  const closeAllDropdowns = useCallback(() => {
+    setOpenDropdowns([]);
+  }, []);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sidebarCollapsed && openDropdowns.length > 0) {
+        const target = event.target as HTMLElement;
+        const sidebar = document.querySelector('[aria-label="Sidebar navigation"]');
+        if (sidebar && !sidebar.contains(target)) {
+          closeAllDropdowns();
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [sidebarCollapsed, openDropdowns, closeAllDropdowns]);
 
   useEffect(() => {
     const newWidth = sidebarCollapsed ? 64 : 240;
     useDashboardStore.getState().setSidebarWidth(newWidth);
+    
+    // Close all dropdowns when sidebar is expanded
+    if (!sidebarCollapsed) {
+      setOpenDropdowns([]);
+    }
   }, [sidebarCollapsed]);
 
   return (
@@ -130,7 +155,7 @@ const Sidebar: React.FC = () => {
 
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col bg-gray-800 dark:bg-gray-700 transition-all duration-300 md:translate-x-0 overflow-y-auto shadow-sm border-r border-gray-300 dark:border-gray-600"
+          "fixed inset-y-0 left-0 z-50 flex flex-col bg-gray-800 dark:bg-gray-700 transition-all duration-300 md:translate-x-0 overflow-visible shadow-sm border-r border-gray-300 dark:border-gray-600"
         )}
         style={{ width: `${sidebarWidth}px` }}
         aria-label="Sidebar navigation"
@@ -183,7 +208,10 @@ const Sidebar: React.FC = () => {
             if (item.children) {
               const isOpen = openDropdowns.includes(item.name);
               return (
-                <div key={item.name}>
+                <div 
+                  key={item.name}
+                  className="relative"
+                >
                   <button
                     onClick={() => toggleDropdown(item.name)}
                     className={cn(
@@ -211,20 +239,34 @@ const Sidebar: React.FC = () => {
                       ))}
                   </button>
 
-                  {isOpen && !sidebarCollapsed && (
-                    <div id={`dropdown-${item.name}`} className="ml-8 mt-1 space-y-1">
+                  {isOpen && (
+                    <div 
+                      id={`dropdown-${item.name}`} 
+                      className={cn(
+                        "absolute bg-white dark:bg-gray-800 rounded-md shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700",
+                        sidebarCollapsed 
+                          ? "left-full top-0 ml-2 min-w-48" 
+                          : "ml-8 mt-1 relative w-full"
+                      )}
+                      style={sidebarCollapsed ? { 
+                        position: 'fixed',
+                        left: `${sidebarWidth + 8}px`,
+                        top: 'auto'
+                      } : {}}
+                    >
                       {item.children.map((sub) => (
                         <NavLink
                           key={sub.name}
                           to={sub.href}
                           className={({ isActive }) =>
                             cn(
-                              "block text-sm rounded-md px-3 py-2 transition-all",
+                              "block px-4 py-2 text-sm transition-all",
                               isActive
                                 ? "bg-yellow-100 dark:bg-yellow-900/20 text-gray-900 dark:text-yellow-400 font-medium"
-                                : "text-white hover:bg-yellow-100 dark:hover:bg-yellow-900/20 hover:text-gray-900 dark:hover:text-yellow-400"
+                                : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                             )
                           }
+                          onClick={() => sidebarCollapsed && closeAllDropdowns()}
                         >
                           {sub.name}
                         </NavLink>

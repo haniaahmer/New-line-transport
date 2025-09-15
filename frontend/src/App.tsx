@@ -25,6 +25,9 @@ import SalesmanSummary from "./pages/SalesmanSummary";
 import FinanceReport from "./pages/FinanceReport";
 import SharedPlatform from "./pages/SharedPlatform";
 import ClearedBooking from "./pages/ClearedBooking";
+import ArchivedInvoices from "./pages/ArchivedInvoices";
+import GenerateInvoice from "./pages/GenerateInvoice";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -54,6 +57,8 @@ const App = () => (
             <Route path="/customers" element={<Customers />} />
             <Route path="/finance/report" element={<FinanceReport />} />
             <Route path="/finance/invoice-summary" element={<Invoicing />} />
+            <Route path="/finance/archived" element={<ArchivedInvoices />} />
+                <Route path="/finance/generate" element={<GenerateInvoice/>} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/communications" element={<div className="p-8 text-center text-muted-foreground">Communications module coming soon...</div>} />
             <Route path="/settings" element={<div className="p-8 text-center text-muted-foreground">Settings coming soon...</div>} />

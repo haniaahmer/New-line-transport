@@ -81,7 +81,7 @@ const SharedPlatform = () => {
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
                   <tr>
-                    <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white min-w-[80px]">#</th>
+                    <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white min-w-[80px]">S.No#</th>
                     <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white min-w-[150px]">Job Id</th>
                     <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white min-w-[150px]">Date & Time</th>
                     <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white min-w-[150px]">Pick Up</th>
