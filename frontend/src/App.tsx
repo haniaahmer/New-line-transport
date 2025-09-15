@@ -27,7 +27,10 @@ import SharedPlatform from "./pages/SharedPlatform";
 import ClearedBooking from "./pages/ClearedBooking";
 import ArchivedInvoices from "./pages/ArchivedInvoices";
 import GenerateInvoice from "./pages/GenerateInvoice";
-
+import PaymentLinkSummary from "./pages/PaymentLinkSummary";
+import DriverPaymentSummary from "./pages/DriverPaymentSummary";
+import RefundSummary from "./pages/RefundSummary";
+import AffiliateList from "./pages/AffiliateList";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -41,7 +44,6 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/cleared-bookings" element={<ClearedBooking />} />
-
             <Route path="/drivers" element={<Drivers />} />
             <Route path="/drivers/fleet" element={<FleetDriver />} />
             <Route path="/drivers/fleet-vehicle" element={<FleetVehicle />} />
@@ -58,7 +60,11 @@ const App = () => (
             <Route path="/finance/report" element={<FinanceReport />} />
             <Route path="/finance/invoice-summary" element={<Invoicing />} />
             <Route path="/finance/archived" element={<ArchivedInvoices />} />
-                <Route path="/finance/generate" element={<GenerateInvoice/>} />
+            <Route path="/finance/generate" element={<GenerateInvoice />} />
+            <Route path="/finance/payment-link" element={<PaymentLinkSummary />} />
+            <Route path="/finance/driver-payment" element={<DriverPaymentSummary  />} />
+            <Route path="/finance/refunds" element={<RefundSummary  />} />
+            <Route path="/affiliate/list" element={<AffiliateList />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/communications" element={<div className="p-8 text-center text-muted-foreground">Communications module coming soon...</div>} />
             <Route path="/settings" element={<div className="p-8 text-center text-muted-foreground">Settings coming soon...</div>} />

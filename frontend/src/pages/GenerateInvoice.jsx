@@ -225,7 +225,7 @@ const GenerateInvoice = () => {
                 type="button"
                 className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-200 hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
               >
-                Submit
+                Generate
               </button>
             </div>
           </div>
