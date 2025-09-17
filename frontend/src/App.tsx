@@ -4,10 +4,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
-import Dashboard from "./pages/Dashboard";
+// import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Summary";
 import Bookings from "./pages/Bookings";
 import Drivers from "./pages/Drivers";
-import Dispatch from "./pages/Dispatch";
+
 import Vehicles from "./pages/Vehicles";
 import Customers from "./pages/Customers";
 import Pricing from "./pages/Pricing";
@@ -31,6 +32,14 @@ import PaymentLinkSummary from "./pages/PaymentLinkSummary";
 import DriverPaymentSummary from "./pages/DriverPaymentSummary";
 import RefundSummary from "./pages/RefundSummary";
 import AffiliateList from "./pages/AffiliateList";
+import TFLReportSummary from "./pages/TFLReportSummary";
+import ServiceFailureRecords from "./pages/ServiceFailureRecords";
+import ComplainRecords from "./pages/ComplainRecords";
+import LostPropertyFound from "./pages/LostPropertyFound";
+import TFLStaffRegistered from "./pages/TFLStaffRegistered";
+import LondonTFLWeeklyReport from "./pages/LondonTFLWeeklyReport";
+
+// Create a client
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -53,7 +62,7 @@ const App = () => (
             <Route path="/clients/individual" element={<PersonalAccountSummary />} />
             <Route path="/clients/subcontractor" element={<SubContractorAccountSummary />} />
             <Route path="/crm/salesman-summary" element={<SalesmanSummary />} />
-            <Route path="/dispatch" element={<Dispatch />} />
+           
             <Route path="/shared-platform" element={<SharedPlatform />} />
             <Route path="/vehicles" element={<Vehicles />} />
             <Route path="/customers" element={<Customers />} />
@@ -63,6 +72,12 @@ const App = () => (
             <Route path="/finance/generate" element={<GenerateInvoice />} />
             <Route path="/finance/payment-link" element={<PaymentLinkSummary />} />
             <Route path="/finance/driver-payment" element={<DriverPaymentSummary  />} />
+            <Route path="/compliance/tfl-report" element={<TFLReportSummary  />} />
+              <Route path="/compliance/service-failure" element={<ServiceFailureRecords  />} />
+              <Route path="/compliance/complaints" element={<ComplainRecords  />} />
+               <Route path="/compliance/lost-property" element={<LostPropertyFound  />} />
+               <Route path="/compliance/tfl-staff" element={<TFLStaffRegistered />} />
+               <Route path="/compliance/london-tfl-weekly" element={<LondonTFLWeeklyReport />} />
             <Route path="/finance/refunds" element={<RefundSummary  />} />
             <Route path="/affiliate/list" element={<AffiliateList />} />
             <Route path="/reports" element={<Reports />} />

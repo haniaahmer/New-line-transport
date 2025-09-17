@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Plus, 
   Filter, 
@@ -31,9 +31,24 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const Bookings = () => {
-  const { bookings } = useDashboardStore();
+  const { bookings, addBooking } = useDashboardStore(); // Assuming addBooking exists in the store
   
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -58,6 +73,56 @@ const Bookings = () => {
     return acc;
   }, {} as Record<string, number>);
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    account: '',
+    costCenter: '',
+    invoiceRef: '',
+    nameCard: null,
+    booker: '',
+    passenger: '',
+    vehicleCategory: '',
+    vehicleType: '',
+    driver: '',
+    journeyType: 'one-way',
+    pickUpDate: '',
+    pickUpTime: '',
+    pickUp: '',
+    dropOff: '',
+    passengers: 0,
+    bigLuggage: 0,
+    smallLuggage: 0,
+    baby: 0,
+    child: 0,
+    booster: 0,
+    note: '',
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    setFormData((prev) => ({ ...prev, nameCard: e.target.files[0] }));
+  };
+
+  const handleSubmit = () => {
+    const newBooking = {
+      id: `BOOKING-${Date.now()}`,
+      customerName: formData.passenger,
+      pickupLocation: formData.pickUp,
+      destination: formData.dropOff,
+      bookingType: formData.journeyType,
+      status: 'pending',
+      scheduledTime: new Date(`${formData.pickUpDate}T${formData.pickUpTime}`),
+      fare: 0, // Placeholder, calculate if needed
+    };
+    addBooking(newBooking);
+    setIsOpen(false);
+    // Reset form if needed
+  };
+
   return (
     <div className="mt-6 px-4 sm:px-6 lg:px-8">
       <div className="space-y-6 animate-fade-in">
@@ -67,10 +132,222 @@ const Bookings = () => {
             <h1 className="text-3xl font-bold text-foreground">Booking Management</h1>
             <p className="text-muted-foreground">Manage all taxi and rental bookings</p>
           </div>
-          <Button className=" bg-blue-500 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-200 hover:bg-blue-600 hover:scale-105">
-            <Plus className="h-4 w-4" />
-            New Booking
-          </Button>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button className=" bg-blue-500 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-200 hover:bg-blue-600 hover:scale-105">
+                <Plus className="h-4 w-4" />
+                New Booking
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-7xl p-6">
+              <DialogHeader>
+                <DialogTitle>Select Account to Allocate Job</DialogTitle>
+              </DialogHeader>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="col-span-2 space-y-6">
+                  {/* Account Section */}
+                  <div>
+                    <Label>Select Account*</Label>
+                    <Select value={formData.account} onValueChange={(value) => setFormData((prev) => ({ ...prev, account: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Account" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="account1">Account 1</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Cost Center</Label>
+                      <Input value={formData.costCenter} name="costCenter" onChange={handleInputChange} />
+                    </div>
+                    <div>
+                      <Label>Invoice Ref</Label>
+                      <Input value={formData.invoiceRef} name="invoiceRef" onChange={handleInputChange} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Name card (override)</Label>
+                      <Input value={formData.nameCard ? formData.nameCard.name : ''} readOnly />
+                    </div>
+                    <div className="flex items-end gap-2">
+                      <Button variant="outline" onClick={() => document.getElementById('namecard-upload').click()}>Browse</Button>
+                      <input id="namecard-upload" type="file" hidden onChange={handleFileChange} />
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Available Namecard In Account</p>
+
+                  {/* Booker Section */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <Label>Select or Add Booker</Label>
+                      <div className="flex gap-2">
+                        <Button variant="link">+ Preset Booker</Button>
+                        <Button variant="link">+ Quick Add</Button>
+                      </div>
+                    </div>
+                    <Select value={formData.booker} onValueChange={(value) => setFormData((prev) => ({ ...prev, booker: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Booker" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="booker1">Booker 1</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button variant="link" className="mt-2">+ Additional Booker</Button>
+                  </div>
+
+                  {/* Passenger Section */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <Label>Select or Add Passenger</Label>
+                      <div className="flex gap-2">
+                        <Button variant="link">+ Preset Passenger</Button>
+                        <Button variant="link">+ Quick Add</Button>
+                      </div>
+                    </div>
+                    <Select value={formData.passenger} onValueChange={(value) => setFormData((prev) => ({ ...prev, passenger: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Passenger" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="passenger1">Passenger 1</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button variant="link" className="mt-2">+ Additional Passenger</Button>
+                  </div>
+
+                  {/* Vehicle Selection */}
+                  <div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <Label>Vehicle Selection</Label>
+                      </div>
+                      <div>
+                        <Label>Distance</Label>
+                      </div>
+                      <div>
+                        <Label>Duration</Label>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mt-2">
+                      <div>
+                        <Label>Preferred Vehicle Category*</Label>
+                        <Select value={formData.vehicleCategory} onValueChange={(value) => setFormData((prev) => ({ ...prev, vehicleCategory: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Vehicle Category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="sedan">Sedan</SelectItem>
+                            <SelectItem value="luxury">Luxury</SelectItem>
+                            <SelectItem value="suv">SUV</SelectItem>
+                            <SelectItem value="van">VAN</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Select Vehicle Type</Label>
+                        <Select value={formData.vehicleType} onValueChange={(value) => setFormData((prev) => ({ ...prev, vehicleType: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Vehicle Type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="type1">Type 1</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Select Driver</Label>
+                        <Select value={formData.driver} onValueChange={(value) => setFormData((prev) => ({ ...prev, driver: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Driver" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="driver1">Driver 1</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Journey Details */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <Label>Journey Details</Label>
+                      <Select value={formData.journeyType} onValueChange={(value) => setFormData((prev) => ({ ...prev, journeyType: value }))}>
+                        <SelectTrigger className="w-40">
+                          <SelectValue placeholder="Transfer (One Way)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="one-way">Transfer (One Way)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Pick-Up Date (dd/mm/yyyy)</Label>
+                        <Input type="date" name="pickUpDate" value={formData.pickUpDate} onChange={handleInputChange} />
+                      </div>
+                      <div>
+                        <Label>Pick-Up Time (HH:mm)</Label>
+                        <Input type="time" name="pickUpTime" value={formData.pickUpTime} onChange={handleInputChange} />
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <Label>Pick Up*</Label>
+                      <Input name="pickUp" value={formData.pickUp} onChange={handleInputChange} placeholder="Pick Up" />
+                    </div>
+                    <div className="mt-4">
+                      <Label>Drop Off*</Label>
+                      <Input name="dropOff" value={formData.dropOff} onChange={handleInputChange} placeholder="Drop Off" />
+                    </div>
+                    <div className="grid grid-cols-6 gap-4 mt-4">
+                      <div>
+                        <Label>Passenger</Label>
+                        <Input type="number" name="passengers" value={formData.passengers} onChange={handleInputChange} />
+                      </div>
+                      <div>
+                        <Label>Big Luggage</Label>
+                        <Input type="number" name="bigLuggage" value={formData.bigLuggage} onChange={handleInputChange} />
+                      </div>
+                      <div>
+                        <Label>Small Luggage</Label>
+                        <Input type="number" name="smallLuggage" value={formData.smallLuggage} onChange={handleInputChange} />
+                      </div>
+                      <div>
+                        <Label>Baby</Label>
+                        <Input type="number" name="baby" value={formData.baby} onChange={handleInputChange} />
+                      </div>
+                      <div>
+                        <Label>Child</Label>
+                        <Input type="number" name="child" value={formData.child} onChange={handleInputChange} />
+                      </div>
+                      <div>
+                        <Label>Booster</Label>
+                        <Input type="number" name="booster" value={formData.booster} onChange={handleInputChange} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Info */}
+                  <div>
+                    <Label>Additional Info</Label>
+                    <Input name="note" value={formData.note} onChange={handleInputChange} placeholder="Note/POA" />
+                  </div>
+
+                  <Button className="bg-green-500 text-white" onClick={handleSubmit}>Save and Proceed</Button>
+                </div>
+                <div>
+                  {/* Map Placeholder */}
+                  <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                    Map
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Stats Cards */}

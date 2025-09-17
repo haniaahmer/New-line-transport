@@ -33,7 +33,6 @@ interface NavigationItem {
 const navigation: NavigationItem[] = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Bookings", href: "/bookings", icon: Calendar },
-  { name: "Dispatch", href: "/dispatch", icon: Truck },
   { name: "Shared Platform", href: "/shared-platform", icon: Users },
   { name: "Cleared Bookings", href: "/cleared-bookings", icon: CheckCircle },
   {
@@ -109,7 +108,7 @@ const Sidebar: React.FC = () => {
 
   const toggleDropdown = useCallback((name: string) => {
     setOpenDropdowns((prev) =>
-      prev.includes(name) ? prev.filter((n) => n !== name) : [name] // Only one dropdown open at a time when collapsed
+      prev.includes(name) ? prev.filter((n) => n !== name) : [name]
     );
   }, []);
 
@@ -117,7 +116,6 @@ const Sidebar: React.FC = () => {
     setOpenDropdowns([]);
   }, []);
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (sidebarCollapsed && openDropdowns.length > 0) {
@@ -137,7 +135,6 @@ const Sidebar: React.FC = () => {
     const newWidth = sidebarCollapsed ? 64 : 240;
     useDashboardStore.getState().setSidebarWidth(newWidth);
     
-    // Close all dropdowns when sidebar is expanded
     if (!sidebarCollapsed) {
       setOpenDropdowns([]);
     }
@@ -160,11 +157,9 @@ const Sidebar: React.FC = () => {
         style={{ width: `${sidebarWidth}px` }}
         aria-label="Sidebar navigation"
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-300 dark:border-gray-600">
-          <div 
-            className="flex items-center gap-3 min-w-0 cursor-pointer"
-            onClick={toggleSidebarCollapse}
-          >
+        <div className="flex items-center h-16 px-4 border-b border-gray-300 dark:border-gray-600">
+          <div className="flex items-center gap-3 min-w-0 w-full">
+            {/* Logo */}
             <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
               <img 
                 src={logoImage} 
@@ -172,26 +167,26 @@ const Sidebar: React.FC = () => {
                 className="h-full w-full object-contain"
               />
             </div>
+            
+            {/* Company info when expanded */}
             {!sidebarCollapsed && (
-              <div className="min-w-0 flex flex-col">
+              <div className="flex-1 min-w-0">
                 <h3 className="text-xl font-bold text-white dark:text-white">NEWLINE</h3>
                 <h4 className="text-sm font-medium text-gray-100 dark:text-gray-200">Transport Company</h4>
               </div>
             )}
-          </div>
-          <div className="flex items-center gap-1">
-            {!sidebarCollapsed && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleSidebarCollapse}
-                className="hidden md:flex h-8 w-8 p-0 hover:bg-gray-300 dark:hover:bg-gray-600"
-                title="Collapse sidebar"
-                aria-label="Collapse sidebar"
-              >
-                <Menu className="h-6 w-6 text-white dark:text-gray-200" />
-              </Button>
-            )}
+            
+            {/* Hamburger menu button - always visible */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleSidebarCollapse}
+              className="h-8 w-8 p-0 hover:bg-gray-300 dark:hover:bg-gray-600 flex-shrink-0 ml-auto"
+              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              <Menu className="h-7 w-7 text-gray-400 dark:text-gray-400" />
+            </Button>
           </div>
         </div>
 
