@@ -90,7 +90,7 @@ const navigation: NavigationItem[] = [
     ],
   },
   { name: "Reports", href: "/reports", icon: BarChart3 },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Settings", href: "/setting", icon: Settings },
 ];
 
 const Sidebar: React.FC = () => {

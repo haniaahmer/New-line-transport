@@ -39,6 +39,8 @@ import LostPropertyFound from "./pages/LostPropertyFound";
 import TFLStaffRegistered from "./pages/TFLStaffRegistered";
 import LondonTFLWeeklyReport from "./pages/LondonTFLWeeklyReport";
 import Map from "./pages/DriverTrackingMap";
+import Setting from "./pages/Setting";
+import Profile from "./pages/Profile";
 // Create a client
 const queryClient = new QueryClient();
 
@@ -82,6 +84,8 @@ const App = () => (
             <Route path="/finance/refunds" element={<RefundSummary  />} />
             <Route path="/affiliate/list" element={<AffiliateList />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/setting" element={<Setting />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/communications" element={<div className="p-8 text-center text-muted-foreground">Communications module coming soon...</div>} />
             <Route path="/settings" element={<div className="p-8 text-center text-muted-foreground">Settings coming soon...</div>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

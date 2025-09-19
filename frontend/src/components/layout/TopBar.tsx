@@ -9,6 +9,7 @@ import {
   LogOut,
   ChevronDown,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // Static translation object for English and Arabic
 const translations = {
@@ -209,10 +210,12 @@ const TopBar = () => {
                 </div>
               </div>
               <div className="py-1">
-                <button className="flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+               <Link to="/profile">
+                  <button className="flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                   <User className="mr-2 h-4 w-4" />
                   {t.profile}
                 </button>
+               </Link>
                 <button className="flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                   <Settings className="mr-2 h-4 w-4" />
                   {t.settings}
