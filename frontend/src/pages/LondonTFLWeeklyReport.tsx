@@ -81,13 +81,7 @@ const SummaryCard: React.FC<{
   );
 };
 
-// Update the stats array to use consistent color names
-const stats = [
-  { title: 'Total Records', value: driverData.length, icon: Clipboard, color: 'blue' },
-  { title: 'Pending Actions', value: 0, icon: AlertTriangle, color: 'orange' }, // Placeholder, adjust as needed
-  { title: 'Resolved Cases', value: 0, icon: CheckCircle, color: 'green' }, // Placeholder, adjust as needed
-  { title: 'In Progress', value: 0, icon: Plus, color: 'purple' }, // Placeholder, adjust as needed
-];
+
 
 const LondonTFLWeeklyReport: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -157,13 +151,7 @@ const LondonTFLWeeklyReport: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
-            <SummaryCard key={index} title={stat.title} value={stat.value} color={stat.color} Icon={stat.icon} />
-          ))}
-        </div>
-
+        
         {/* Filters Container */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
           <div className="flex flex-wrap gap-4 items-center justify-between">

@@ -233,6 +233,25 @@ const ArchivedInvoices = () => {
     setShowRestoreConfirm(false);
   };
 
+  const cancelRestore = () => {
+    setShowRestoreConfirm(false);
+  };
+
+  const handleExportCSV = () => {
+    // Implement CSV export functionality
+    console.log('Exporting filtered invoices to CSV');
+  };
+
+  const handleViewInvoice = (invoiceId) => {
+    // Implement view invoice functionality
+    console.log('Viewing invoice:', invoiceId);
+  };
+
+  const handleDeleteInvoice = (invoiceId) => {
+    // Implement delete invoice functionality
+    console.log('Deleting invoice:', invoiceId);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -257,61 +276,13 @@ const ArchivedInvoices = () => {
                   Restore ({selectedInvoices.length})
                 </button>
               )}
-              <button className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-full font-medium flex items-center gap-2 transition-all duration-200">
+              <button 
+                onClick={() => handleExportCSV()}
+                className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-full font-medium flex items-center gap-2 transition-all duration-200"
+              >
                 <Download size={20} />
                 Export Archive
               </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Archive Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                <Archive className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Archived</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalArchived}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Archive Value</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(totalArchivedValue)}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Paid & Archived</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{paidArchivedCount}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gray-100 dark:bg-gray-900/30 rounded-lg">
-                <X className="h-6 w-6 text-gray-600 dark:text-gray-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Cancelled</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{cancelledCount}</p>
-              </div>
             </div>
           </div>
         </div>
@@ -440,7 +411,10 @@ const ArchivedInvoices = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Export</label>
-                  <button className="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200">
+                  <button 
+                    onClick={handleExportCSV}
+                    className="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200"
+                  >
                     <Download size={16} />
                     Export CSV
                   </button>
@@ -542,10 +516,16 @@ const ArchivedInvoices = () => {
                           >
                             <RotateCcw size={16} />
                           </button>
-                          <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                          <button 
+                            onClick={() => handleViewInvoice(invoice.id)}
+                            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+                          >
                             <Eye size={16} />
                           </button>
-                          <button className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors duration-200">
+                          <button 
+                            onClick={() => handleDeleteInvoice(invoice.id)}
+                            className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors duration-200"
+                          >
                             <Trash2 size={16} />
                           </button>
                         </div>
@@ -556,188 +536,74 @@ const ArchivedInvoices = () => {
               </table>
             </div>
           </div>
-        </div>
 
-        {/* Pagination */}
-        <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-700 dark:text-gray-300">
-            Page {currentPage} of {totalPages}
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={`flex items-center gap-1 px-4 py-2 rounded-lg ${
-                currentPage === 1
-                  ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-            >
-              <ChevronLeft size={18} />
-              Previous
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className={`flex items-center gap-1 px-4 py-2 rounded-lg ${
-                currentPage === totalPages
-                  ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-            >
-              Next
-              <ChevronRight size={18} />
-            </button>
-          </div>
-        </div>
-
-        {/* Archive Management Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <RotateCcw className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Restoration Options</h3>
-            </div>
-            <div className="space-y-4">
-              <div className="p-4 border border-blue-200 dark:border-blue-700 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-                <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">Individual Restore</h4>
-                <p className="text-sm text-blue-700 dark:text-blue-400 mb-3">
-                  Restore single invoices back to active billing status.
-                </p>
-                <button className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium">
-                  Learn More →
-                </button>
-              </div>
-
-              <div className="p-4 border border-green-200 dark:border-green-700 rounded-lg bg-green-50 dark:bg-green-900/20">
-                <h4 className="font-medium text-green-900 dark:text-green-300 mb-2">Bulk Restore</h4>
-                <p className="text-sm text-green-700 dark:text-green-400 mb-3">
-                  Restore multiple invoices at once with validation checks.
-                </p>
-                <button className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 text-sm font-medium">
-                  Learn More →
-                </button>
-              </div>
-
-              <div className="p-4 border border-purple-200 dark:border-purple-700 rounded-lg bg-purple-50 dark:bg-purple-900/20">
-                <h4 className="font-medium text-purple-900 dark:text-purple-300 mb-2">Client Reactivation</h4>
-                <p className="text-sm text-purple-700 dark:text-purple-400 mb-3">
-                  Restore all archived invoices for a specific client.
-                </p>
-                <button className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium">
-                  Learn More →
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Archive Management</h3>
-            </div>
-            <div className="space-y-3">
-              <button className="w-full bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-lg font-medium flex items-center gap-3 transition-all duration-200">
-                <FileText size={16} />
-                Archive Policy Settings
-              </button>
-              
-              <button className="w-full bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-lg font-medium flex items-center gap-3 transition-all duration-200">
-                <Download size={16} />
-                Backup Archive Data
-              </button>
-              
-              <button className="w-full bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-lg font-medium flex items-center gap-3 transition-all duration-200">
-                <Calendar size={16} />
-                Retention Schedule
-              </button>
-              
-              <button className="w-full bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-lg font-medium flex items-center gap-3 transition-all duration-200">
-                <TrendingUp size={16} />
-                Archive Analytics
-              </button>
-              
-              <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
-                <button className="w-full bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 text-red-700 dark:text-red-400 py-3 px-4 rounded-lg font-medium flex items-center gap-3 transition-all duration-200">
-                  <Trash2 size={16} />
-                  Permanent Deletion
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Archive Statistics */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Archive Statistics</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">87%</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Paid Before Archive</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">12</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Months Avg Retention</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">5%</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Restoration Rate</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-amber-600 dark:text-amber-400 mb-2">2.1GB</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Archive Size</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Restore Confirmation Modal */}
-      {showRestoreConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-md mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <RotateCcw className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Confirm Restoration</h3>
-            </div>
-            
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Are you sure you want to restore {selectedInvoices.length} invoice{selectedInvoices.length !== 1 ? 's' : ''} 
-              back to active billing status? This action will move them from the archive to your active invoices.
-            </p>
-            
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-6">
-              <div className="flex items-start gap-2">
-                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
-                <div className="text-sm text-blue-700 dark:text-blue-400">
-                  <strong>Note:</strong> Restored invoices will retain all their original data and timestamps. 
-                  Any overdue invoices will need manual status updates.
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-700 dark:text-gray-300">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className={`flex items-center gap-1 px-4 py-2 rounded-lg ${
+                      currentPage === 1
+                        ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <ChevronLeft size={18} />
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className={`flex items-center gap-1 px-4 py-2 rounded-lg ${
+                      currentPage === totalPages
+                        ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    Next
+                    <ChevronRight size={18} />
+                  </button>
                 </div>
               </div>
             </div>
-            
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowRestoreConfirm(false)}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-lg font-medium transition-colors duration-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmRestore}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
-              >
-                <RotateCcw size={16} />
-                Restore
-              </button>
+          )}
+        </div>
+
+        {/* Restore Confirmation Modal */}
+        {showRestoreConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertCircle className="h-6 w-6 text-yellow-500" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Confirm Restore</h3>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                Are you sure you want to restore {selectedInvoices.length} invoice(s) to active status? This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={cancelRestore}
+                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmRestore}
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  Restore Invoices
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

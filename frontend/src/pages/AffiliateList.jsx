@@ -74,12 +74,6 @@ const AffiliateList = () => {
     },
   ];
 
-  const stats = [
-    { title: 'Total Partners', value: affiliates.length, icon: Users, color: 'purple' },
-    { title: 'Active Partners', value: affiliates.filter(a => a.status === 'Active').length, icon: Globe, color: 'green' },
-    { title: 'Operation Centers', value: new Set(affiliates.map(a => a.operationCenter)).size, icon: Building, color: 'blue' },
-    { title: 'Can Send Work', value: affiliates.filter(a => a.canSendWork).length, icon: Send, color: 'amber' }
-  ];
 
   const getStatusBadge = (status) => {
     const statusColors = {
@@ -241,32 +235,7 @@ const AffiliateList = () => {
           </div>
         </div>
 
-        {/* Stats Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            const colorClasses = {
-              blue: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-              green: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-              purple: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
-              amber: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
-            };
-            return (
-              <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-lg ${colorClasses[stat.color]}`}>
-                    <Icon size={24} />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
+       
         {/* Tab Navigation */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
           <div className="flex border-b border-gray-200 dark:border-gray-700">

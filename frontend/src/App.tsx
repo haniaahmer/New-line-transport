@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 // import Dashboard from "./pages/Dashboard";
 import Dashboard from "./pages/Summary";
-import Bookings from "./pages/Bookings";
+import Bookings from "./pages/NewBooking";
 import Drivers from "./pages/Drivers";
 
 import Vehicles from "./pages/Vehicles";
@@ -38,7 +38,7 @@ import ComplainRecords from "./pages/ComplainRecords";
 import LostPropertyFound from "./pages/LostPropertyFound";
 import TFLStaffRegistered from "./pages/TFLStaffRegistered";
 import LondonTFLWeeklyReport from "./pages/LondonTFLWeeklyReport";
-
+import Map from "./pages/DriverTrackingMap";
 // Create a client
 const queryClient = new QueryClient();
 
@@ -52,6 +52,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/bookings" element={<Bookings />} />
+            <Route path="/map" element={<Map />} />
             <Route path="/cleared-bookings" element={<ClearedBooking />} />
             <Route path="/drivers" element={<Drivers />} />
             <Route path="/drivers/fleet" element={<FleetDriver />} />

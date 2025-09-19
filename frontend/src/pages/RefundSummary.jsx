@@ -83,12 +83,7 @@ const RefundSummary = () => {
     return sum + (isNaN(amount) ? 0 : amount);
   }, 0);
 
-  const stats = [
-    { title: 'Total Refunds', value: refunds.length, icon: RefreshCw, color: 'blue' },
-    { title: 'Total Refund Amount', value: `${totalRefundAmount.toLocaleString()} SAR`, icon: DollarSign, color: 'green' },
-    { title: 'Processed', value: refunds.filter(r => r.status === 'Processed').length, icon: Calendar, color: 'purple' },
-    { title: 'Pending', value: refunds.filter(r => r.status === 'Pending' || r.status === 'Processing').length, icon: Clock, color: 'orange' }
-  ];
+  
 
   const getStatusBadge = (status) => {
     const statusColors = {
@@ -239,31 +234,8 @@ const RefundSummary = () => {
           </div>
         </div>
 
-        {/* Stats Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            const colorClasses = {
-              blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
-              green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
-              purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
-              orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
-            };
-            return (
-              <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-1">{stat.title}</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                  </div>
-                  <div className={`p-3 rounded-xl ${colorClasses[stat.color]}`}>
-                    <Icon size={24} />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+     
+       
 
         {/* Filters Container */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">

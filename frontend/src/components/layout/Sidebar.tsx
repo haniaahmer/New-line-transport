@@ -7,9 +7,7 @@ import {
   Car,
   DollarSign,
   BarChart3,
-  MessageSquare,
   Settings,
-  Truck,
   ChevronDown,
   ChevronUp,
   Menu,
@@ -17,6 +15,7 @@ import {
   Handshake,
   Shield,
   CheckCircle,
+  Map,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboardStore } from "@/stores/dashboardStore";
@@ -32,6 +31,7 @@ interface NavigationItem {
 
 const navigation: NavigationItem[] = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Map", href: "/map", icon: Map },
   { name: "Bookings", href: "/bookings", icon: Calendar },
   { name: "Shared Platform", href: "/shared-platform", icon: Users },
   { name: "Cleared Bookings", href: "/cleared-bookings", icon: CheckCircle },
@@ -75,9 +75,7 @@ const navigation: NavigationItem[] = [
   {
     name: "Affiliate",
     icon: Handshake,
-    children: [
-      { name: "Affiliate List", href: "/affiliate/list" },
-    ],
+    children: [{ name: "Affiliate List", href: "/affiliate/list" }],
   },
   {
     name: "Compliance",
@@ -127,14 +125,14 @@ const Sidebar: React.FC = () => {
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, [sidebarCollapsed, openDropdowns, closeAllDropdowns]);
 
   useEffect(() => {
     const newWidth = sidebarCollapsed ? 64 : 240;
     useDashboardStore.getState().setSidebarWidth(newWidth);
-    
+
     if (!sidebarCollapsed) {
       setOpenDropdowns([]);
     }
@@ -161,31 +159,36 @@ const Sidebar: React.FC = () => {
           <div className="flex items-center gap-3 min-w-0 w-full">
             {/* Logo */}
             <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-              <img 
-                src={logoImage} 
-                alt="NEWLINE Logo" 
+              <img
+                src={logoImage}
+                alt="NEWLINE Logo"
                 className="h-full w-full object-contain"
               />
             </div>
-            
+
             {/* Company info when expanded */}
             {!sidebarCollapsed && (
               <div className="flex-1 min-w-0">
-                <h3 className="text-xl font-bold text-white dark:text-white">NEWLINE</h3>
-                <h4 className="text-sm font-medium text-gray-100 dark:text-gray-200">Transport Company</h4>
+                <h4 className="text-xl font-bold text-white">NEWLINE</h4>
+                <h5 className="text-xs font-medium text-gray-100">
+                  Transport Company
+                </h5>
               </div>
             )}
-            
-            {/* Hamburger menu button - always visible */}
+
+            {/* Hamburger menu button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={toggleSidebarCollapse}
-              className="h-8 w-8 p-0 hover:bg-gray-300 dark:hover:bg-gray-600 flex-shrink-0 ml-auto"
+              className={cn(
+                "h-8 w-8 p-0 hover:bg-[#FEE282] dark:hover:bg-[#FEE282] flex-shrink-0 transition-all duration-300",
+                sidebarCollapsed ? "ml-5" : "ml-auto"
+              )}
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <Menu className="h-7 w-7 text-gray-400 dark:text-gray-400" />
+              <Menu className="h-7 w-7 text-gray-400" />
             </Button>
           </div>
         </div>
@@ -203,10 +206,7 @@ const Sidebar: React.FC = () => {
             if (item.children) {
               const isOpen = openDropdowns.includes(item.name);
               return (
-                <div 
-                  key={item.name}
-                  className="relative"
-                >
+                <div key={item.name} className="relative">
                   <button
                     onClick={() => toggleDropdown(item.name)}
                     className={cn(
@@ -214,40 +214,48 @@ const Sidebar: React.FC = () => {
                       sidebarCollapsed
                         ? "px-2 py-2.5 justify-center"
                         : "px-3 py-2.5",
-                      "text-white hover:bg-yellow-100 dark:hover:bg-yellow-900/20 hover:text-gray-900 dark:hover:text-yellow-400"
+                      "text-white hover:bg-yellow-200 dark:hover:bg-yellow-900/20 hover:text-gray-900 dark:hover:text-yellow-400"
                     )}
                     aria-expanded={isOpen}
                     aria-controls={`dropdown-${item.name}`}
                     title={sidebarCollapsed ? item.name : undefined}
                   >
                     {Icon && (
-                      <Icon className="h-5 w-5 flex-shrink-0 text-white dark:text-gray-200" aria-hidden="true" />
+                      <Icon
+                        className="h-5 w-5 flex-shrink-0 text-white"
+                        aria-hidden="true"
+                      />
                     )}
                     {!sidebarCollapsed && (
                       <span className="flex-1 text-left">{item.name}</span>
                     )}
                     {!sidebarCollapsed &&
                       (isOpen ? (
-                        <ChevronUp className="h-4 w-4 ml-auto text-gray-100 dark:text-gray-200" aria-hidden="true" />
+                        <ChevronUp className="h-4 w-4 ml-auto text-gray-100" />
                       ) : (
-                        <ChevronDown className="h-4 w-4 ml-auto text-gray-100 dark:text-gray-200" aria-hidden="true" />
+                        <ChevronDown className="h-4 w-4 ml-auto text-gray-100" />
                       ))}
                   </button>
 
                   {isOpen && (
-                    <div 
-                      id={`dropdown-${item.name}`} 
+                    <div
+                      id={`dropdown-${item.name}`}
                       className={cn(
-                        "absolute bg-white dark:bg-gray-800 rounded-md shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700",
-                        sidebarCollapsed 
-                          ? "left-full top-0 ml-2 min-w-48" 
-                          : "ml-8 mt-1 relative w-full"
+                        "absolute rounded-md shadow-lg py-2 z-50",
+                        sidebarCollapsed
+                          ? "left-full top-0 ml-2 min-w-48"
+                          : "ml-8 mt-1 relative w-full",
+                        "bg-gray-800 dark:bg-gray-700"
                       )}
-                      style={sidebarCollapsed ? { 
-                        position: 'fixed',
-                        left: `${sidebarWidth + 8}px`,
-                        top: 'auto'
-                      } : {}}
+                      style={
+                        sidebarCollapsed
+                          ? {
+                              position: "fixed",
+                              left: `${sidebarWidth + 8}px`,
+                              top: "auto",
+                            }
+                          : {}
+                      }
                     >
                       {item.children.map((sub) => (
                         <NavLink
@@ -255,10 +263,10 @@ const Sidebar: React.FC = () => {
                           to={sub.href}
                           className={({ isActive }) =>
                             cn(
-                              "block px-4 py-2 text-sm transition-all",
+                              "block px-4 py-2 text-sm transition-all rounded-md",
                               isActive
                                 ? "bg-yellow-100 dark:bg-yellow-900/20 text-gray-900 dark:text-yellow-400 font-medium"
-                                : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                : "text-white hover:bg-yellow-100 dark:hover:bg-yellow-900/20 hover:text-gray-900 dark:hover:text-yellow-400"
                             )
                           }
                           onClick={() => sidebarCollapsed && closeAllDropdowns()}
@@ -283,8 +291,8 @@ const Sidebar: React.FC = () => {
                       ? "px-2 py-2.5 justify-center"
                       : "px-3 py-2.5",
                     isActive
-                      ? "bg-yellow-100 dark:bg-yellow-900/20 text-gray-900 dark:text-yellow-400 shadow-sm border-r-2 border-yellow-500 dark:border-yellow-400"
-                      : "text-white hover:bg-yellow-100 dark:hover:bg-yellow-900/20 hover:text-gray-900 dark:hover:text-yellow-400"
+                      ? "bg-[#FEE282] dark:bg-yellow-900/20 text-gray-900 dark:text-yellow-400 shadow-sm border-r-2 border-yellow-500"
+                      : "text-white hover:bg-yellow-200 dark:hover:bg-yellow-900/20 hover:text-gray-900 dark:hover:text-yellow-400"
                   )
                 }
                 title={sidebarCollapsed ? item.name : undefined}
@@ -295,16 +303,15 @@ const Sidebar: React.FC = () => {
                       <Icon
                         className={cn(
                           "h-5 w-5 flex-shrink-0",
-                          isActive ? "text-yellow-600 dark:text-yellow-400" : "text-white dark:text-gray-200"
+                          isActive
+                            ? "text-yellow-600 dark:text-yellow-00"
+                            : "text-[#FEE282]"
                         )}
-                        aria-hidden="true"
                       />
                     )}
-                    {!sidebarCollapsed && (
-                      <span className="flex-1">{item.name}</span>
-                    )}
+                    {!sidebarCollapsed && <span className="flex-1">{item.name}</span>}
                     {sidebarCollapsed && (
-                      <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 dark:bg-gray-600 text-white dark:text-gray-200 text-xs rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                      <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
                         {item.name}
                       </div>
                     )}

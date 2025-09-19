@@ -121,18 +121,7 @@ const Summary = () => {
 
   const currentDateData = datesSummary[currentDateIndex];
   
-  // Calculate overall statistics
-  const overallStats = useMemo(() => {
-    const allJobs = datesSummary.flatMap(d => d.jobs);
-    return {
-      totalJobs: allJobs.length,
-      totalRevenue: datesSummary.reduce((sum, d) => sum + d.revenue, 0),
-      totalMargin: datesSummary.reduce((sum, d) => sum + d.margin, 0),
-      avgJobValue: allJobs.length > 0 ? datesSummary.reduce((sum, d) => sum + d.revenue, 0) / allJobs.length : 0,
-      confirmedJobs: allJobs.filter(j => j.status === 'confirmed').length,
-      inProgressJobs: allJobs.filter(j => j.status === 'in-progress').length
-    };
-  }, []);
+  
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -373,65 +362,7 @@ const Summary = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <Briefcase className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Jobs</p>
-                  <p className="text-2xl font-bold text-foreground">{overallStats.totalJobs}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-success/10 rounded-lg">
-                  <DollarSign className="h-6 w-6 text-success" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Revenue</p>
-                  <p className="text-2xl font-bold text-foreground">{formatCurrency(overallStats.totalRevenue)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-accent/10 rounded-lg">
-                  <TrendingUp className="h-6 w-6 text-accent" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Avg Job Value</p>
-                  <p className="text-2xl font-bold text-foreground">{formatCurrency(overallStats.avgJobValue)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-warning/10 rounded-lg">
-                  <Clock className="h-6 w-6 text-warning" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Active Jobs</p>
-                  <p className="text-2xl font-bold text-foreground">{overallStats.inProgressJobs}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
+       
         {/* Filters */}
         <Card>
           <CardHeader>

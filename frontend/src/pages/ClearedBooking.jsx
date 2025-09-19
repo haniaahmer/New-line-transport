@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Download, Plus, Edit, Trash2, CheckCircle, Calendar, Truck, DollarSign, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Download, Plus, Edit, Trash2, CheckCircle, Calendar, Truck, DollarSign, ChevronLeft, ChevronRight, X, MapPin } from 'lucide-react';
 import {
   createColumnHelper,
   flexRender,
@@ -18,8 +18,11 @@ const ClearedBooking = () => {
     pageIndex: 0,
     pageSize: 5,
   });
+  const [showAddBookingModal, setShowAddBookingModal] = useState(false);
+  const [editingBooking, setEditingBooking] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  const bookings = [
+  const [bookings, setBookings] = useState([
     { 
       id: 1, 
       accountName: 'Company A', 
@@ -77,14 +80,27 @@ const ClearedBooking = () => {
       priceReview: 'Approved', 
       status: 'Cleared' 
     },
-  ];
+  ]);
 
-  const stats = [
-    { title: 'Total Cleared Bookings', value: bookings.length, icon: CheckCircle, color: 'green' },
-    { title: 'Recent Clearances', value: bookings.filter(b => new Date(b.jobDate) >= new Date('2025-09-01')).length, icon: Calendar, color: 'orange' },
-    { title: 'Total Revenue', value: '$470', icon: DollarSign, color: 'blue' },
-    { title: 'Drivers Involved', value: new Set(bookings.map(b => b.driver)).size, icon: Truck, color: 'purple' }
-  ];
+  const [newBooking, setNewBooking] = useState({
+    accountName: '',
+    jobNo: '',
+    jobRef: '',
+    jobDate: '',
+    time: '',
+    passenger: '',
+    jobType: '',
+    reqVeh: '',
+    pickUpAddress: '',
+    dropOffAddress: '',
+    distanceDriven: '',
+    driver: '',
+    total: '',
+    paymentType: '',
+    priceReview: '',
+    status: 'Cleared',
+  });
+
 
   const getStatusBadge = (status) => (
     <span
@@ -171,14 +187,16 @@ const ClearedBooking = () => {
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <button
-            onClick={() => handleEdit(row.original.id)}
+            onClick={() => handleEdit(row.original)}
             className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-150"
+            aria-label="Edit booking"
           >
             <Edit size={16} />
           </button>
           <button
             onClick={() => handleDelete(row.original.id)}
             className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-150"
+            aria-label="Delete booking"
           >
             <Trash2 size={16} />
           </button>
@@ -197,7 +215,7 @@ const ClearedBooking = () => {
         const matchesStatus = statusFilter === 'All' || booking.status === statusFilter;
         return matchesSearch && matchesStatus;
       }),
-    [searchTerm, statusFilter]
+    [bookings, searchTerm, statusFilter]
   );
 
   const table = useReactTable({
@@ -221,20 +239,78 @@ const ClearedBooking = () => {
     table.setPageIndex(0);
   };
 
-  const handleEdit = (bookingId) => {
-    console.log('Edit booking:', bookingId);
+  const handleAddBooking = () => {
+    setEditingBooking(null);
+    setNewBooking({
+      accountName: '',
+      jobNo: '',
+      jobRef: '',
+      jobDate: '',
+      time: '',
+      passenger: '',
+      jobType: '',
+      reqVeh: '',
+      pickUpAddress: '',
+      dropOffAddress: '',
+      distanceDriven: '',
+      driver: '',
+      total: '',
+      paymentType: '',
+      priceReview: '',
+      status: 'Cleared',
+    });
+    setShowAddBookingModal(true);
+  };
+
+  const handleEdit = (booking) => {
+    setEditingBooking(booking);
+    setNewBooking({ ...booking });
+    setShowAddBookingModal(true);
   };
 
   const handleDelete = (bookingId) => {
-    console.log('Delete booking:', bookingId);
+    setDeleteConfirm(bookingId);
   };
 
-  const handleAddBooking = () => {
-    console.log('Add new booking');
+  const confirmDelete = () => {
+    setBookings(bookings.filter((booking) => booking.id !== deleteConfirm));
+    setDeleteConfirm(null);
+  };
+
+  const handleCloseModal = () => {
+    setShowAddBookingModal(false);
+    setEditingBooking(null);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewBooking({
+      ...newBooking,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (editingBooking) {
+      setBookings(
+        bookings.map((booking) =>
+          booking.id === editingBooking.id ? { ...newBooking, id: editingBooking.id } : booking
+        )
+      );
+    } else {
+      const bookingToAdd = {
+        id: Math.max(...bookings.map((booking) => booking.id), 0) + 1,
+        ...newBooking,
+      };
+      setBookings([...bookings, bookingToAdd]);
+    }
+    handleCloseModal();
   };
 
   const handleExportCSV = () => {
     console.log('Export CSV');
+    alert('CSV export functionality would be implemented here');
   };
 
   return (
@@ -255,32 +331,6 @@ const ClearedBooking = () => {
               Add Booking
             </button>
           </div>
-        </div>
-
-        {/* Stats Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            const colorClasses = {
-              green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
-              orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
-              blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
-              purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
-            };
-            return (
-              <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-1">{stat.title}</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                  </div>
-                  <div className={`p-3 rounded-xl ${colorClasses[stat.color]}`}>
-                    <Icon size={24} />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
         </div>
 
         {/* Filters Container */}
@@ -405,18 +455,26 @@ const ClearedBooking = () => {
                   ))}
                 </thead>
                 <tbody>
-                  {table.getRowModel().rows.map((row) => (
-                    <tr
-                      key={row.id}
-                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="py-4 px-6">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      ))}
+                  {table.getRowModel().rows.length > 0 ? (
+                    table.getRowModel().rows.map((row) => (
+                      <tr
+                        key={row.id}
+                        className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <td key={cell.id} className="py-4 px-6">
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={columns.length} className="py-8 text-center text-gray-500 dark:text-gray-400">
+                        No bookings found. {bookings.length === 0 ? 'Add your first booking using the "Add Booking" button.' : 'Try adjusting your search or filters.'}
+                      </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -453,6 +511,311 @@ const ClearedBooking = () => {
             </div>
           </div>
         </div>
+
+        {/* Add/Edit Booking Modal */}
+        {showAddBookingModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+            <div className="w-full max-w-2xl max-h-[80vh] bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden flex flex-col">
+              {/* Modal Header */}
+              <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                  {editingBooking ? 'Edit Booking' : 'Add New Booking'}
+                </h2>
+                <button
+                  onClick={handleCloseModal}
+                  className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
+                  aria-label="Close modal"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              {/* Modal Body */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <form onSubmit={handleSubmit}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <Truck size={14} />
+                        Account Name
+                      </label>
+                      <input
+                        type="text"
+                        name="accountName"
+                        value={newBooking.accountName}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                        placeholder="e.g., Company A"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <Truck size={14} />
+                        Job No.#
+                      </label>
+                      <input
+                        type="text"
+                        name="jobNo"
+                        value={newBooking.jobNo}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                        placeholder="e.g., 001"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <Truck size={14} />
+                        Job Ref
+                      </label>
+                      <input
+                        type="text"
+                        name="jobRef"
+                        value={newBooking.jobRef}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                        placeholder="e.g., REF001"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <Calendar size={14} />
+                        Job Date
+                      </label>
+                      <input
+                        type="date"
+                        name="jobDate"
+                        value={newBooking.jobDate}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <Calendar size={14} />
+                        Time
+                      </label>
+                      <input
+                        type="time"
+                        name="time"
+                        value={newBooking.time}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <Truck size={14} />
+                        Passenger
+                      </label>
+                      <input
+                        type="text"
+                        name="passenger"
+                        value={newBooking.passenger}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                        placeholder="e.g., John Doe"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <Truck size={14} />
+                        Job Type
+                      </label>
+                      <select
+                        name="jobType"
+                        value={newBooking.jobType}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                      >
+                        <option value="" disabled>Select Job Type</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Express">Express</option>
+                        <option value="Priority">Priority</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <Truck size={14} />
+                        Required Vehicle
+                      </label>
+                      <select
+                        name="reqVeh"
+                        value={newBooking.reqVeh}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                      >
+                        <option value="" disabled>Select Vehicle</option>
+                        <option value="Van">Van</option>
+                        <option value="Truck">Truck</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <MapPin size={14} />
+                        Pick Up Address
+                      </label>
+                      <input
+                        type="text"
+                        name="pickUpAddress"
+                        value={newBooking.pickUpAddress}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                        placeholder="e.g., 123 London St, London"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <MapPin size={14} />
+                        Drop Off Address
+                      </label>
+                      <input
+                        type="text"
+                        name="dropOffAddress"
+                        value={newBooking.dropOffAddress}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                        placeholder="e.g., 456 Birmingham Rd, Birmingham"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <Truck size={14} />
+                        Distance Driven
+                      </label>
+                      <input
+                        type="text"
+                        name="distanceDriven"
+                        value={newBooking.distanceDriven}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                        placeholder="e.g., 150 km"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <Truck size={14} />
+                        Driver
+                      </label>
+                      <input
+                        type="text"
+                        name="driver"
+                        value={newBooking.driver}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                        placeholder="e.g., Mike S"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <DollarSign size={14} />
+                        Total
+                      </label>
+                      <input
+                        type="text"
+                        name="total"
+                        value={newBooking.total}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                        placeholder="e.g., $120"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <DollarSign size={14} />
+                        Payment Type
+                      </label>
+                      <select
+                        name="paymentType"
+                        value={newBooking.paymentType}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                      >
+                        <option value="" disabled>Select Payment Type</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                      </select>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                        <CheckCircle size={14} />
+                        Price Review
+                      </label>
+                      <select
+                        name="priceReview"
+                        value={newBooking.priceReview}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        required
+                      >
+                        <option value="" disabled>Select Price Review</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Pending">Pending</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  {/* Modal Footer */}
+                  <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
+                    <button
+                      type="button"
+                      onClick={handleCloseModal}
+                      className="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-150 text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-150 text-sm dark:bg-blue-700 dark:hover:bg-blue-800"
+                    >
+                      {editingBooking ? 'Update Booking' : 'Add Booking'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+            <div className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-xl p-4">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white mb-2">Confirm Deletion</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                Are you sure you want to delete this booking? This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="px-3 py-1.5 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-150 text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors duration-150 text-sm"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -101,12 +101,7 @@ const ComplainRecords = () => {
   const { pageIndex, pageSize } = table.getState().pagination;
   const totalRecords = filteredRecords.length;
 
-  const stats = [
-    { title: 'Total Records', value: totalRecords, icon: Clipboard, color: 'blue' },
-    { title: 'Pending Actions', value: filteredRecords.filter(r => r.action === 'Pending').length, icon: AlertTriangle, color: 'orange' },
-    { title: 'Resolved Cases', value: filteredRecords.filter(r => r.action === 'Resolved').length, icon: CheckCircle, color: 'green' },
-    { title: 'In Progress', value: filteredRecords.filter(r => r.action === 'In Progress').length, icon: Plus, color: 'purple' }
-  ];
+ 
 
   const resetFilters = () => {
     setSearchTerm('');
@@ -134,18 +129,6 @@ const ComplainRecords = () => {
           </div>
         </div>
 
-        {/* Stats Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
-            <SummaryCard
-              key={index}
-              title={stat.title}
-              value={stat.value}
-              color={stat.color}
-              Icon={stat.icon}
-            />
-          ))}
-        </div>
 
         {/* Filters Container */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">

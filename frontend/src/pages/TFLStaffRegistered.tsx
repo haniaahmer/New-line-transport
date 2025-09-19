@@ -28,12 +28,7 @@ const tflStaffRecords: TFLStaffRecord[] = [
   { bookingId: '002', fullName: 'Jane Smith', dob: '1985-03-20', dbsRefNo: 'DBS124', dbsLastCheckDate: '2025-09-14', designation: 'Supervisor', type: 'Part-time', dateTime: '2025-09-15 14:30' },
 ];
 
-const stats = [
-  { title: 'Total Registered Staff', value: tflStaffRecords.length, icon: Search, color: 'green' },
-  { title: 'Recent Registrations', value: tflStaffRecords.filter(b => new Date(b.dateTime) >= new Date('2025-09-01')).length, icon: ChevronRight, color: 'orange' },
-  { title: 'Active Staff', value: tflStaffRecords.length, icon: ChevronLeft, color: 'blue' },
-  { title: 'Pending Checks', value: 0, icon: ChevronLeft, color: 'purple' }
-];
+
 
 const columnHelper = createColumnHelper<TFLStaffRecord>();
 
@@ -133,32 +128,6 @@ const TFLStaffRegistered: React.FC = () => {
               Add Staff
             </button>
           </div>
-        </div>
-
-        {/* Stats Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            const colorClasses = {
-              green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
-              orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
-              blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
-              purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
-            };
-            return (
-              <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-1">{stat.title}</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                  </div>
-                  <div className={`p-3 rounded-xl ${colorClasses[stat.color]}`}>
-                    <Icon size={24} />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
         </div>
 
         {/* Filters Container */}
