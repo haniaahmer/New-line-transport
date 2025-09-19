@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
 
 const Profile = () => {
   const fileInputRef = useRef(null);
@@ -12,12 +13,33 @@ const Profile = () => {
     "https://i.pravatar.cc/150?img=12"
   );
 
+  // Dynamic state for all fields
+  const [profileData, setProfileData] = useState({
+    fullName: "Arsal Zaheer",
+    email: "arsal@example.com",
+    phone: "+92 300 1234567",
+    role: "Administrator",
+    address: "123 Main Street",
+    city: "Karachi",
+    state: "Sindh",
+    country: "Pakistan",
+    postalCode: "74200",
+    about: "I am managing operations and client handling for Newline Transport.",
+  });
+
+  // Handle input change dynamically
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setProfileData({ ...profileData, [name]: value });
+  };
+
   // Handle file upload
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setProfileImage(imageUrl);
+      toast.success("Profile photo updated!");
     }
   };
 
@@ -26,8 +48,15 @@ const Profile = () => {
     fileInputRef.current?.click();
   };
 
+  // Save changes
+  const handleSave = () => {
+    toast.success("Profile updated successfully!");
+    console.log(profileData);
+  };
+
   return (
     <div className="p-8">
+      <Toaster position="top-right" reverseOrder={false} />
       {/* Page Title */}
       <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
         <User className="w-6 h-6 text-primary" />
@@ -35,7 +64,7 @@ const Profile = () => {
       </h1>
 
       {/* Profile Card */}
-      <Card className="rounded-2xl shadow-lg max-w-4xl  border border-gray-200">
+      <Card className="rounded-2xl shadow-lg max-w-4xl border border-gray-200">
         <CardContent className="p-8 space-y-8">
           {/* Avatar + Basic Info */}
           <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -44,7 +73,7 @@ const Profile = () => {
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <div className="text-center sm:text-left">
-              <h2 className="text-xl font-semibold">Arsal Zaheer</h2>
+              <h2 className="text-xl font-semibold">{profileData.fullName}</h2>
               <p className="text-gray-500 text-sm">Admin - Newline Transport</p>
               <Button
                 variant="outline"
@@ -68,39 +97,77 @@ const Profile = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <Label>Full Name</Label>
-              <Input defaultValue="Arsal Zaheer" />
+              <Input
+                name="fullName"
+                value={profileData.fullName}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <Label>Email</Label>
-              <Input type="email" defaultValue="arsal@example.com" />
+              <Input
+                type="email"
+                name="email"
+                value={profileData.email}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <Label>Phone Number</Label>
-              <Input type="tel" defaultValue="+92 300 1234567" />
+              <Input
+                type="tel"
+                name="phone"
+                value={profileData.phone}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <Label>Role</Label>
-              <Input defaultValue="Administrator" disabled />
+              <Input
+                name="role"
+                value={profileData.role}
+                disabled
+              />
             </div>
             <div>
               <Label>Address</Label>
-              <Input defaultValue="123 Main Street" />
+              <Input
+                name="address"
+                value={profileData.address}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <Label>City</Label>
-              <Input defaultValue="Karachi" />
+              <Input
+                name="city"
+                value={profileData.city}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <Label>State</Label>
-              <Input defaultValue="Sindh" />
+              <Input
+                name="state"
+                value={profileData.state}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <Label>Country</Label>
-              <Input defaultValue="Pakistan" />
+              <Input
+                name="country"
+                value={profileData.country}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <Label>Postal Code</Label>
-              <Input defaultValue="74200" />
+              <Input
+                name="postalCode"
+                value={profileData.postalCode}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
@@ -108,17 +175,18 @@ const Profile = () => {
           <div>
             <Label>About Me</Label>
             <textarea
+              name="about"
               className="w-full border rounded-lg p-3 mt-1 focus:ring-2 focus:ring-primary"
               rows={4}
-              placeholder="Write something about yourself..."
-              defaultValue="I am managing operations and client handling for Newline Transport."
+              value={profileData.about}
+              onChange={handleChange}
             />
           </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-4">
             <Button variant="destructive">Cancel</Button>
-            <Button>Save Changes</Button>
+            <Button onClick={handleSave}>Save Changes</Button>
           </div>
         </CardContent>
       </Card>
