@@ -11,7 +11,7 @@ import Drivers from "./pages/Drivers";
 
 import Vehicles from "./pages/Vehicles";
 import Customers from "./pages/Customers";
-import Pricing from "./pages/Pricing";
+
 import Invoicing from "./pages/Invoicing";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";

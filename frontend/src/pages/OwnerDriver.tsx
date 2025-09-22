@@ -8,19 +8,43 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  ColumnDef,
+  SortingState,
+  PaginationState,
 } from '@tanstack/react-table';
 
-const OwnerDriver = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [gradeFilter, setGradeFilter] = useState('All');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [sorting, setSorting] = useState([]);
-  const [pagination, setPagination] = useState({
+interface Driver {
+  id: number;
+  name: string;
+  grade: string;
+  status: string;
+  address: string;
+  joinDate: string;
+  activeVehicles: number;
+  lastJobDate: string | null;
+  holdBlockDate: string | null;
+}
+
+interface FormData {
+  name: string;
+  grade: string;
+  status: string;
+  address: string;
+  joinDate: string;
+  activeVehicles: number;
+}
+
+const OwnerDriver: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [gradeFilter, setGradeFilter] = useState<string>('All');
+  const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 5,
   });
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [formData, setFormData] = useState({
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     grade: 'Standard',
     status: 'Active',
@@ -28,10 +52,10 @@ const OwnerDriver = () => {
     joinDate: '',
     activeVehicles: 0,
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
-  const drivers = [
+  const drivers: Driver[] = [
     {
       id: 1,
       name: 'Demo Hitik',
@@ -45,7 +69,7 @@ const OwnerDriver = () => {
     },
   ];
 
-  const getStatusBadge = (status) => (
+  const getStatusBadge = (status: string) => (
     <span
       className={`px-3 py-1 rounded-full text-sm font-medium ${
         status === 'Active'
@@ -57,7 +81,7 @@ const OwnerDriver = () => {
     </span>
   );
 
-  const getGradeBadge = (grade) => (
+  const getGradeBadge = (grade: string) => (
     <span
       className={`px-3 py-1 rounded-full text-sm font-medium ${
         grade === 'VIP'
@@ -69,9 +93,9 @@ const OwnerDriver = () => {
     </span>
   );
 
-  const columnHelper = createColumnHelper();
+  const columnHelper = createColumnHelper<Driver>();
 
-  const columns = useMemo(() => [
+  const columns = useMemo<ColumnDef<Driver, any>[]>(() => [
     columnHelper.accessor('id', {
       header: 'Sl.No.',
       cell: (info) => <span className="text-gray-900 dark:text-white">{info.getValue()}</span>,
@@ -123,12 +147,12 @@ const OwnerDriver = () => {
         return (
           <span
             className={`text-sm font-medium ${
-              value === 'No Jobs'
+              value === 'No Jobs' || value === null
                 ? 'text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/20 px-2 py-1 rounded-full'
                 : 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20 px-2 py-1 rounded-full'
             }`}
           >
-            {value}
+            {value || 'No Jobs'}
           </span>
         );
       },
@@ -160,7 +184,7 @@ const OwnerDriver = () => {
       ),
       minSize: 100,
     }),
-  ], []);
+  ], [columnHelper]);
 
   const filteredDrivers = useMemo(
     () =>
@@ -195,12 +219,12 @@ const OwnerDriver = () => {
     table.setPageIndex(0);
   };
 
-  const handleEdit = (driverId) => {
+  const handleEdit = (driverId: number) => {
     console.log('Edit driver:', driverId);
     // TODO: Implement edit functionality
   };
 
-  const handleDelete = (driverId) => {
+  const handleDelete = (driverId: number) => {
     console.log('Delete driver:', driverId);
     // TODO: Implement delete functionality
   };
@@ -223,7 +247,7 @@ const OwnerDriver = () => {
     setError('');
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -231,7 +255,7 @@ const OwnerDriver = () => {
     }));
   };
 
-  const validateForm = () => {
+  const validateForm = (): boolean => {
     if (!formData.name.trim()) {
       setError('Driver Name is required');
       return false;
@@ -248,7 +272,7 @@ const OwnerDriver = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -260,7 +284,7 @@ const OwnerDriver = () => {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Add new driver to the list (in a real app, this would be an API call)
-      const newDriver = {
+      const newDriver: Driver = {
         ...formData,
         id: Math.max(...drivers.map((d) => d.id)) + 1,
         lastJobDate: 'No Jobs',
@@ -433,7 +457,7 @@ const OwnerDriver = () => {
                               {{
                                 asc: ' ↑',
                                 desc: ' ↓',
-                              }[header.column.getIsSorted()] ?? null}
+                              }[header.column.getIsSorted() as string] ?? null}
                             </div>
                           </th>
                         ))}
@@ -677,47 +701,23 @@ const OwnerDriver = () => {
       )}
 
       {/* Animation and Scrollbar styles */}
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.2s ease-out;
-        }
-        .scrollbar-thin {
-          scrollbar-width: thin; /* Firefox */
-          scrollbar-color: rgba(209, 213, 219, 0.7) rgba(243, 244, 246, 0.5); /* Firefox */
-        }
-        .scrollbar-thin::-webkit-scrollbar {
-          width: 8px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-track {
-          background: rgba(243, 244, 246, 0.5); /* Light mode track */
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-          background: rgba(209, 213, 219, 0.7); /* Light mode thumb */
-          border-radius: 4px;
-        }
-        .dark .scrollbar-thin::-webkit-scrollbar-track {
-          background: rgba(31, 41, 55, 0.5); /* Dark mode track */
-        }
-        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-          background: rgba(75, 85, 99, 0.7); /* Dark mode thumb */
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-          background: rgba(156, 163, 175, 0.9);
-        }
-        .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-          background: rgba(107, 114, 128, 0.9);
-        }
-      `}</style>
+     <style>{`
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+  }
+  /* rest of your CSS */
+`}</style>
+
     </>
   );
 };

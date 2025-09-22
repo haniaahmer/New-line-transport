@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Download, Plus, Edit, Trash2, Truck, DollarSign, Calendar, CheckCircle, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
+import { Search, Download, Plus, Edit, Trash2, Truck, DollarSign, Calendar, CheckCircle, ChevronLeft, ChevronRight, FileText, X } from 'lucide-react';
 import {
   createColumnHelper,
   flexRender,
@@ -18,6 +18,16 @@ const DriverPaymentSummary = () => {
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 5,
+  });
+  const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false);
+  const [newPayment, setNewPayment] = useState({
+    driverName: '',
+    driverId: '',
+    totalAmount: '',
+    paidAmount: '',
+    paymentMethod: 'Bank Transfer',
+    paymentDate: '',
+    status: 'Paid'
   });
 
   const payments = [
@@ -82,8 +92,6 @@ const DriverPaymentSummary = () => {
       jobsCompleted: 7
     }
   ];
-
- 
 
   const getStatusBadge = (status) => {
     const statusStyles = {
@@ -258,7 +266,35 @@ const DriverPaymentSummary = () => {
   };
 
   const handleAddPayment = () => {
-    console.log('Add new payment');
+    setIsAddPaymentOpen(true);
+  };
+
+  const handleCloseAddPayment = () => {
+    setIsAddPaymentOpen(false);
+    setNewPayment({
+      driverName: '',
+      driverId: '',
+      totalAmount: '',
+      paidAmount: '',
+      paymentMethod: 'Bank Transfer',
+      paymentDate: '',
+      status: 'Paid'
+    });
+  };
+
+  const handlePaymentInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewPayment(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePaymentSubmit = (e) => {
+    e.preventDefault();
+    console.log('Add new payment:', newPayment);
+    // Here you would typically add the payment to your data
+    handleCloseAddPayment();
   };
 
   const handleExportExcel = () => {
@@ -298,6 +334,148 @@ const DriverPaymentSummary = () => {
           </div>
         </div>
 
+        {/* Add Payment Modal */}
+        {isAddPaymentOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-full max-w-md p-6 relative">
+              <button
+                onClick={handleCloseAddPayment}
+                className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                <X size={22} />
+              </button>
+
+              <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+                Add New Payment
+              </h2>
+
+            <form onSubmit={handlePaymentSubmit} className="space-y-4">
+  {/* Driver Name + Driver ID */}
+  <div className="flex gap-4">
+    <div className="flex-1">
+      <label className="block text-gray-600 dark:text-gray-300 mb-1">
+        Driver Name
+      </label>
+      <input
+        type="text"
+        name="driverName"
+        value={newPayment.driverName}
+        onChange={handlePaymentInputChange}
+        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+        placeholder="Enter driver name"
+        required
+      />
+    </div>
+
+    <div className="flex-1">
+      <label className="block text-gray-600 dark:text-gray-300 mb-1">
+        Driver ID
+      </label>
+      <input
+        type="text"
+        name="driverId"
+        value={newPayment.driverId}
+        onChange={handlePaymentInputChange}
+        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+        placeholder="Enter driver ID"
+        required
+      />
+    </div>
+  </div>
+
+  {/* Total Amount + Paid Amount */}
+  <div className="flex gap-4">
+    <div className="flex-1">
+      <label className="block text-gray-600 dark:text-gray-300 mb-1">
+        Total Amount
+      </label>
+      <input
+        type="text"
+        name="totalAmount"
+        value={newPayment.totalAmount}
+        onChange={handlePaymentInputChange}
+        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+        placeholder="Enter total amount"
+        required
+      />
+    </div>
+
+    <div className="flex-1">
+      <label className="block text-gray-600 dark:text-gray-300 mb-1">
+        Paid Amount
+      </label>
+      <input
+        type="text"
+        name="paidAmount"
+        value={newPayment.paidAmount}
+        onChange={handlePaymentInputChange}
+        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+        placeholder="Enter paid amount"
+        required
+      />
+    </div>
+  </div>
+
+  {/* Payment Method + Payment Date */}
+  <div className="flex gap-4">
+    <div className="flex-1">
+      <label className="block text-gray-600 dark:text-gray-300 mb-1">
+        Payment Method
+      </label>
+      <select
+        name="paymentMethod"
+        value={newPayment.paymentMethod}
+        onChange={handlePaymentInputChange}
+        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+      >
+        <option value="Bank Transfer">Bank Transfer</option>
+        <option value="Cash">Cash</option>
+        <option value="Check">Check</option>
+      </select>
+    </div>
+
+    <div className="flex-1">
+      <label className="block text-gray-600 dark:text-gray-300 mb-1">
+        Payment Date
+      </label>
+      <input
+        type="date"
+        name="paymentDate"
+        value={newPayment.paymentDate}
+        onChange={handlePaymentInputChange}
+        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+      />
+    </div>
+  </div>
+
+  {/* Status (single full row) */}
+  <div>
+    <label className="block text-gray-600 dark:text-gray-300 mb-1">
+      Status
+    </label>
+    <select
+      name="status"
+      value={newPayment.status}
+      onChange={handlePaymentInputChange}
+      className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+    >
+      <option value="Paid">Paid</option>
+      <option value="Pending">Pending</option>
+      <option value="Partial">Partial</option>
+    </select>
+  </div>
+
+  <button
+    type="submit"
+    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-medium transition-all"
+  >
+    Add Payment
+  </button>
+</form>
+
+            </div>
+          </div>
+        )}
         
         {/* Filters Container */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">

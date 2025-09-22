@@ -8,10 +8,51 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  ColumnDef,
+  SortingState,
+  PaginationState,
 } from '@tanstack/react-table';
 
+// Define types for our data
+type JobData = {
+  id: string;
+  booker: string;
+  passenger: string;
+  date: string;
+  time: string;
+  pickup: string;
+  dropoff: string;
+  driver: string;
+  vehicle: string;
+  accountName: string;
+  cashJob: string;
+  review: string;
+  revenue: number;
+  cost: number;
+  vat: number;
+  margin: number;
+  fleetShare: number;
+  marginPercent: string;
+};
+
+type Filters = {
+  search: string;
+  from: string;
+  to: string;
+  month: string;
+  client: string;
+  driver: string;
+  vehicle: string;
+};
+
+type JobDataForm = {
+  title: string;
+  location: string;
+  salary: string;
+};
+
 const FinanceReport = () => {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<Filters>({
     search: '',
     from: '',
     to: '',
@@ -22,13 +63,19 @@ const FinanceReport = () => {
   });
   const [showFromCalendar, setShowFromCalendar] = useState(false);
   const [showToCalendar, setShowToCalendar] = useState(false);
-  const [sorting, setSorting] = useState([]);
-  const [pagination, setPagination] = useState({
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 5,
   });
+  const [isOpen, setIsOpen] = useState(false);
+  const [jobDataForm, setJobDataForm] = useState<JobDataForm>({
+    title: "",
+    location: "",
+    salary: "",
+  });
 
-  const jobData = [
+  const jobData: JobData[] = [
     {
       id: 'KIMPTON112484',
       booker: 'HOTEL KIMPTON',
@@ -64,7 +111,7 @@ const FinanceReport = () => {
   ];
 
   const generateDates = () => {
-    const dates = [];
+    const dates: string[] = [];
     const today = new Date();
     for (let i = -30; i <= 30; i++) {
       const date = new Date();
@@ -89,7 +136,7 @@ const FinanceReport = () => {
     netMargin: `$${jobData.reduce((sum, job) => sum + job.margin, 0).toFixed(2)}`,
   };
 
-  const formatCurrency = (amount) => {
+  const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -98,7 +145,7 @@ const FinanceReport = () => {
     }).format(amount);
   };
 
-  const formatDateForDisplay = (dateStr) => {
+  const formatDateForDisplay = (dateStr: string) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', { 
@@ -108,12 +155,12 @@ const FinanceReport = () => {
     });
   };
 
-  const handleFilterChange = (key, value) => {
+  const handleFilterChange = (key: keyof Filters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     table.setPageIndex(0);
   };
 
-  const handleDateSelect = (date, type) => {
+  const handleDateSelect = (date: string, type: 'from' | 'to') => {
     handleFilterChange(type, date);
     if (type === 'from') setShowFromCalendar(false);
     if (type === 'to') setShowToCalendar(false);
@@ -147,9 +194,9 @@ const FinanceReport = () => {
     });
   }, [filters]);
 
-  const columnHelper = createColumnHelper();
+  const columnHelper = createColumnHelper<JobData>();
 
-  const columns = [
+  const columns: ColumnDef<JobData, any>[] = [
     columnHelper.accessor('id', {
       header: '#',
       cell: (info) => <span className="text-blue-600 dark:text-blue-400 font-medium">{info.getValue()}</span>,
@@ -227,12 +274,33 @@ const FinanceReport = () => {
     },
   });
 
-  const handleAddJob = () => {
-    console.log('Add new job');
+  const handleExportCSV = () => {
+    // CSV export ka logic yahan aayega
+    console.log("Exporting CSV...");
   };
 
-  const handleExportCSV = () => {
-    console.log('Export CSV');
+  const handleAddJob = () => {
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setJobDataForm({
+      ...jobDataForm,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("New Job Added:", jobDataForm);
+    // Yahan API call ya database logic aayega
+    setIsOpen(false);
+    setJobDataForm({ title: "", location: "", salary: "" });
   };
 
   return (
@@ -245,22 +313,94 @@ const FinanceReport = () => {
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Finance Report</h1>
               <p className="text-gray-600 dark:text-gray-400">Manage and track financial metrics and job activities</p>
             </div>
-            <div className="flex items-center gap-3">
+           <div className="flex items-center gap-3">
+      <button
+        onClick={handleExportCSV}
+        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-full font-medium flex items-center gap-2 transition-all duration-200"
+      >
+        <Download size={20} />
+        Export CSV
+      </button>
+
+      <button
+        onClick={handleAddJob}
+        className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-200 hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
+      >
+        <Plus size={20} />
+        Add Job
+      </button>
+
+      {/* Modal / Popup */}
+      {isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-full max-w-md p-6 relative">
+            <button
+              onClick={handleClose}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            >
+              <X size={22} />
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+              Add New Job
+            </h2>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-gray-600 dark:text-gray-300 mb-1">
+                  Job Title
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={jobDataForm.title}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="Enter job title"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-600 dark:text-gray-300 mb-1">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={jobDataForm.location}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="Enter location"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-600 dark:text-gray-300 mb-1">
+                  Salary
+                </label>
+                <input
+                  type="text"
+                  name="salary"
+                  value={jobDataForm.salary}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="Enter salary"
+                />
+              </div>
+
               <button
-                onClick={handleExportCSV}
-                className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-full font-medium flex items-center gap-2 transition-all duration-200"
+                type="submit"
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-medium transition-all"
               >
-                <Download size={20} />
-                Export CSV
+                Save Job
               </button>
-              <button
-                onClick={handleAddJob}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-200 hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
-              >
-                <Plus size={20} />
-                Add Job
-              </button>
-            </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
           </div>
 
           {/* Filters Section */}
@@ -454,7 +594,7 @@ const FinanceReport = () => {
                             {{
                               asc: ' ↑',
                               desc: ' ↓',
-                            }[header.column.getIsSorted()] ?? null}
+                            }[header.column.getIsSorted() as string] ?? null}
                           </div>
                         </th>
                       ))}
@@ -479,6 +619,7 @@ const FinanceReport = () => {
             </div>
           </div>
           <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            
             <div className="flex items-center justify-between">
               <div className="font-medium text-gray-700 dark:text-gray-300">
                 <span>{summary.totalJobs} job{summary.totalJobs !== 1 ? 's' : ''} for {summary.accountName}</span>
